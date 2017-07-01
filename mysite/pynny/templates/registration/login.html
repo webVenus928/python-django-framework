@@ -1,0 +1,19 @@
+{% extends 'pynny/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% if user.is_authenticated %}
+    <div class="alert alert-info" role="alert">
+        <strong>Oy!</strong> You've already logged in as <b>{{ user.get_username }}</b>. 
+        View your <a href='/pynny/{{ user.get_username }}'>profile</a>.
+    </div>
+{% else %}
+    {% block content %}
+    <h2>Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+    {% endblock %}
+{% endif %}

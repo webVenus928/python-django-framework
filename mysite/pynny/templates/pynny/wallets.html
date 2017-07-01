@@ -1,0 +1,12 @@
+{% extends 'pynny/base.html' %}
+
+{% block content %}
+    {% if not user.is_authenticated %}
+        <div class="alert alert-danger" role="alert">
+            You need to login first!
+        </div>
+    {% else %}
+        <h1>Wallets</h1>
+        <h2>{{ user.get_username }}</h2>
+    {% endif %}
+{% endblock %}
