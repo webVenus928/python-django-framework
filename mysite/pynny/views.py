@@ -29,6 +29,10 @@ def wallets(request):
     # Is user logged in?
     if request.user.is_authenticated():
         data = {}
+
+        # Get the wallets for this user
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+
         return render(request, 'pynny/wallets.html', context=data)
 
     # Not authenticated; send to login
