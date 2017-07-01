@@ -14,17 +14,22 @@ from .models import Wallet, BudgetCategory, Transaction, Budget
 
 def index(request):
     '''The Home page for Pynny'''
-    if request.method == 'GET':
-        return HttpResponse('Hi. Welcome to Pynny.')
-    return HttpResponse('Eck!')
+    # If user not logged in, show the landing page
+    if not request.user.is_authenticated():
+        return render(request, 'pynny/landing_page.html')
+
+    # User is logged in, so retrieve their data and
+    # show them their home page, displaying a dashboard
+    data = {}
+    return render(request, 'pynny/dashboard.html', context=data)
 
 
 def wallets(request):
     '''Display Wallets for a user'''
     # Is user logged in?
     if request.user.is_authenticated():
-        username = request.user.get_username()
-        return HttpResponse('Viewing Wallets for ' + username + '...')
+        data = {}
+        return render(request, 'pynny/wallets.html', context=data)
 
     # Not authenticated; send to login
     return redirect(reverse('login'))
@@ -34,8 +39,8 @@ def budgets(request):
     '''Display Budgets for a user'''
     # Is user logged in?
     if request.user.is_authenticated():
-        username = request.user.get_username()
-        return HttpResponse('Viewing Budgets for ' + username + '...')
+        data = {}
+        return render(request, 'pynny/budgets.html', context=data)
 
     # Not authenticated; send to login
     return redirect(reverse('login'))
@@ -45,8 +50,8 @@ def transactions(request):
     '''View transactions for a user'''
     # Is user logged in?
     if request.user.is_authenticated():
-        username = request.user.get_username()
-        return HttpResponse('Viewing Transactions for ' + username + '...')
+        data = {}
+        return render(request, 'pynny/transactions.html', context=data)
 
     # Not authenticated; send to login
     return redirect(reverse('login'))
@@ -56,8 +61,8 @@ def budget_categories(request):
     '''View BudgetCategories for a user'''
     # Is user logged in?
     if request.user.is_authenticated():
-        username = request.user.get_username()
-        return HttpResponse('Viewing Budget Categories for ' + username + '...')
+        data = {}
+        return render(request, 'pynny/categories.html', context=data)
 
     # Not authenticated; send to login
     return redirect(reverse('login'))
@@ -67,8 +72,8 @@ def profile(request):
     '''Display a user profile'''
     # Is user logged in?
     if request.user.is_authenticated():
-        username = request.user.get_username()
-        return HttpResponse('Viewing profile for ' + username)
+        data = {}
+        return render(request, 'pynny/profile.html', context=data)
 
     # Not authenticated; send to login
     return redirect(reverse('login'))

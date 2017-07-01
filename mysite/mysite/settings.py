@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-LOGIN_REDIRECT_URL = '/pynny/profile'
+LOGIN_REDIRECT_URL = '/pynny/'
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 

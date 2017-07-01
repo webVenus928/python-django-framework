@@ -9,6 +9,17 @@
 
     <body>
         <div class="content container">
+            {% if user.is_authenticated %}
+                <ul class="nav nav-tabs">
+                    <li role="presentation"><a href="{% url 'index' %}">Home</a></li>
+                    <li role="presentation"><a href="{% url 'profile' %}">Profile</a></li>
+                    <li role="presentation"><a href="{% url 'wallets' %}">Wallets</a></li>
+                    <li role="presentation"><a href="{% url 'budgets' %}">Budgets</a></li>
+                    <li role="presentation"><a href="{% url 'categories' %}">Categories</a></li>
+                    <li role="presentation"><a href="{% url 'transactions' %}">Transaction</a></li>
+                    <li role="presentation"><a href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            {% endif %}
             {% block content %}
             {% endblock %}
         </div>
