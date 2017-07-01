@@ -11,6 +11,7 @@ the necessary tables in the database.
 
 from django.db import models
 from django.utils import timezone
+from datetime import date
 from django.contrib import auth
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -29,7 +30,7 @@ class Wallet(models.Model):
 
     def __str__(self):
         '''Returns the string representation (`name`)'''
-        return self.name + ' [' + self.user.username + ']'
+        return self.name
 
 
 @python_2_unicode_compatible
@@ -44,7 +45,7 @@ class BudgetCategory(models.Model):
 
     def __str__(self):
         '''Returns the string representation (`name`)'''
-        return self.name+ ' [' + self.user.username + ']'
+        return self.name
 
 
 @python_2_unicode_compatible
@@ -66,7 +67,7 @@ class Transaction(models.Model):
 
     def __str__(self):
         '''Returns the string representation (`name`)'''
-        return self.category.name + ' - ' + str(self.amount)+ ' [' + self.user.username + ']'
+        return self.category.name
 
 
 @python_2_unicode_compatible
@@ -80,12 +81,12 @@ class Budget(models.Model):
     Wallet this Budget applies to.'''
     category = models.ForeignKey(BudgetCategory, on_delete=models.CASCADE)
     goal = models.DecimalField(max_digits=20, decimal_places=2)
-    month = models.DateField(auto_now_add=True)
+    month = models.DateField(default=date.today, blank=True)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
 
     def __str__(self):
         '''Returns the string representation (`name`)'''
-        return self.category.name + ' Budget (' + self.wallet.name + ') [' + self.user.username + ']'
+        return self.category.name
 
 
