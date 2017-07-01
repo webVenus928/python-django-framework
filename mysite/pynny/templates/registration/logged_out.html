@@ -1,7 +1,13 @@
-{% extends 'pynny/base.html' %}
+{{% extends 'pynny/base.html' %}
 
 {% block title %}Logged Out{% endblock %}
 
 {% block content %}
-  <h2>Logged Out.</h2>
-{% endblock %}
+  <div class="alert alert-success">
+      <strong>Bye!</strong> You have been logged out successfully
+  </div>
+
+  <div class="alert alert-info">
+      <strong>Mess up?</strong> You can log back in <a href="{% url 'login' %}">here</a>.
+  </div>
+{% endblock %}}
