@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Wallet, Budget, Transaction, BudgetCategory
+
+admin.site.register(Wallet)
+admin.site.register(BudgetCategory)
+admin.site.register(Transaction)
+admin.site.register(Budget)

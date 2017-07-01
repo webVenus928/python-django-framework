@@ -10,8 +10,58 @@ the necessary tables in the database.
 '''
 
 from django.db import models
+from django.utils import timezone
+from django.contrib import auth
 
 class Wallet(models.Model):
     '''A source/destination for income and spending.
-    For example, your checking account, credit card, or cash'''
-    pass
+    For example, your checking account, credit card, or cash.
+    `balance` uses the Python `decimal.Decimal` class.
+    `created_time` is a `datetime.datetime` timestamp for
+    when the Wallet was created. `created_time` defaults
+    to the current timestamp.'''
+    name = models.CharField(max_length=60)
+    balance = models.DecimalField(max_digits=20, decimal_places=2, default=0, blank=True)
+    created_time = models.DateTimeField(editable=False, blank=True, default=timezone.now)
+    user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
+
+
+class BudgetCategory(models.Model):
+    '''A category to tag transactions and budgets with.
+    The `is_income` field determines if the category
+    denotes income or expenses. By default
+    `is_income` is False.'''
+    name = models.CharField(max_length=60)
+    is_income = models.BooleanField(default=False)
+    user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
+
+
+class Transaction(models.Model):
+    '''A record of income or an expense. `amount`
+    uses the Python `decimal.Decimal` class.
+    `category` refers to a BudgetCategory; this category
+    determines whether the transaction was an expense or not.
+    `description` is an optional human-readable description
+    of the transaction (i.e. groceries @ Krogers).
+    `created_time` is a `datetime.datetime` instance
+    and defaults to the current timestamp.'''
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
+    category = models.OneToOneField(BudgetCategory, on_delete=models.CASCADE)
+    description = models.CharField(max_length=150, blank=True, default='')
+    created_time = models.DateTimeField(blank=True, default=timezone.now)
+    user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
+
+
+class Budget(models.Model):
+    '''A user-created budget that is applied to a
+    particular Wallet. The Budget is categorized by
+    a Category with `category`. `goal` is the user-defined
+    goal for the budget, which is monthly-based.
+    `month` is a `datetime.date` instance indicating what
+    month the Budget applies to. `wallet` refers to the
+    Wallet this Budget applies to.'''
+    category = models.ForeignKey(BudgetCategory, on_delete=models.CASCADE)
+    goal = models.DecimalField(max_digits=20, decimal_places=2)
+    month = models.DateField(auto_now_add=True)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
