@@ -12,7 +12,9 @@ the necessary tables in the database.
 from django.db import models
 from django.utils import timezone
 from django.contrib import auth
+from django.utils.encoding import python_2_unicode_compatible
 
+@python_2_unicode_compatible
 class Wallet(models.Model):
     '''A source/destination for income and spending.
     For example, your checking account, credit card, or cash.
@@ -25,7 +27,12 @@ class Wallet(models.Model):
     created_time = models.DateTimeField(editable=False, blank=True, default=timezone.now)
     user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
 
+    def __str__(self):
+        '''Returns the string representation (`name`)'''
+        return self.name
 
+
+@python_2_unicode_compatible
 class BudgetCategory(models.Model):
     '''A category to tag transactions and budgets with.
     The `is_income` field determines if the category
@@ -35,7 +42,12 @@ class BudgetCategory(models.Model):
     is_income = models.BooleanField(default=False)
     user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
 
+    def __str__(self):
+        '''Returns the string representation (`name`)'''
+        return self.name
 
+
+@python_2_unicode_compatible
 class Transaction(models.Model):
     '''A record of income or an expense. `amount`
     uses the Python `decimal.Decimal` class.
@@ -49,9 +61,15 @@ class Transaction(models.Model):
     category = models.OneToOneField(BudgetCategory, on_delete=models.CASCADE)
     description = models.CharField(max_length=150, blank=True, default='')
     created_time = models.DateTimeField(blank=True, default=timezone.now)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
 
+    def __str__(self):
+        '''Returns the string representation (`name`)'''
+        return self.category.name + ' - ' + str(self.amount)
 
+
+@python_2_unicode_compatible
 class Budget(models.Model):
     '''A user-created budget that is applied to a
     particular Wallet. The Budget is categorized by
@@ -65,3 +83,9 @@ class Budget(models.Model):
     month = models.DateField(auto_now_add=True)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
+
+    def __str__(self):
+        '''Returns the string representation (`name`)'''
+        return self.category.name + ' Budget (' + self.wallet.name + ')'
+
+
