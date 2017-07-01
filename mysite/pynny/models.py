@@ -29,7 +29,7 @@ class Wallet(models.Model):
 
     def __str__(self):
         '''Returns the string representation (`name`)'''
-        return self.name
+        return self.name + ' [' + self.user.username + ']'
 
 
 @python_2_unicode_compatible
@@ -44,7 +44,7 @@ class BudgetCategory(models.Model):
 
     def __str__(self):
         '''Returns the string representation (`name`)'''
-        return self.name
+        return self.name+ ' [' + self.user.username + ']'
 
 
 @python_2_unicode_compatible
@@ -66,7 +66,7 @@ class Transaction(models.Model):
 
     def __str__(self):
         '''Returns the string representation (`name`)'''
-        return self.category.name + ' - ' + str(self.amount)
+        return self.category.name + ' - ' + str(self.amount)+ ' [' + self.user.username + ']'
 
 
 @python_2_unicode_compatible
@@ -86,6 +86,6 @@ class Budget(models.Model):
 
     def __str__(self):
         '''Returns the string representation (`name`)'''
-        return self.category.name + ' Budget (' + self.wallet.name + ')'
+        return self.category.name + ' Budget (' + self.wallet.name + ') [' + self.user.username + ']'
 
 
