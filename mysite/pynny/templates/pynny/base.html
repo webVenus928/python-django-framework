@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 {% load staticfiles %}
 <html>
     <head>
@@ -11,7 +12,7 @@
         <div class="content container">
             {% if user.is_authenticated %}
                 <ul class="nav nav-tabs">
-                    <li role="presentation"><a href="{% url 'index' %}">Home</a></li>
+                    <li role="presentation" class="active"><a href="{% url 'index' %}"><strong>Pynny</strong></a></li>
                     <li role="presentation"><a href="{% url 'profile' %}">Profile</a></li>
                     <li role="presentation"><a href="{% url 'wallets' %}">Wallets</a></li>
                     <li role="presentation"><a href="{% url 'budgets' %}">Budgets</a></li>
@@ -20,6 +21,20 @@
                     <li role="presentation"><a href="{% url 'logout' %}">Logout</a></li>
                 </ul>
             {% endif %}
+
+            {% if alerts %}
+                {% if alerts.info %}
+                    {% for alert in alerts.info %}
+                        <div class="alert alert-info">{{ alert }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% if alerts.errors %}
+                    {% for alert in alerts.errors %}
+                        <div class="alert alert-danger">{{ alert }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+
             {% block content %}
             {% endblock %}
         </div>

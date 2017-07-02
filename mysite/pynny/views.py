@@ -8,7 +8,7 @@ Implements the views (endpoint handlers) for the Pynny web app.
 '''
 
 from django.http import HttpResponse
-from django.shortcuts import render, reverse, redirect
+from django.shortcuts import render, reverse, redirect, get_object_or_404
 
 from .models import Wallet, BudgetCategory, Transaction, Budget
 
@@ -37,6 +37,34 @@ def wallets(request):
 
     # Not authenticated; send to login
     return redirect(reverse('login'))
+
+
+def one_wallet(request, wallet_id):
+    '''Handles requests to a specific wallet'''
+    if not request.user.is_authenticated:
+        return redirect(reverse('login'))
+
+    data = {}
+
+    # Check if the wallet is owned by the logged in user
+    wallet = get_object_or_404(Wallet, id=wallet_id)
+    if wallet.user != request.user:
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+        data['alerts'] = {'errors': ['That wallet does not exist.']}
+        return render(request, 'pynny/wallets.html', context=data)
+
+    if request.method == 'POST':
+        # Delete the wallet
+        wallet.delete()
+
+        # And return them to the wallets page
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+        data['alerts'] = {'info': ['Your ' + wallet.name + ' wallet was successfully deleted']}
+        return render(request, 'pynny/wallets.html', context=data)
+    elif request.method == 'GET':
+        # Show the specific Wallet data
+        data['wallet'] = wallet
+        return render(request, 'pynny/one_wallet.html', context=data)
 
 
 def budgets(request):

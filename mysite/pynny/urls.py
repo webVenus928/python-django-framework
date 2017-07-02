@@ -18,8 +18,9 @@ urlpatterns = [
     url(r'^login/$', auth_views.login, name='login'), # /login/
     url(r'^logout/$', auth_views.logout, name='logout'), # /logout/
     url(r'^profile/$', views.profile, name='profile'), # /profile/
-    url(r'^wallets/$', views.wallets, name='wallets'), # /zcking/wallets/
-    url(r'^budgets/$', views.budgets, name='budgets'), # /zcking/budgets/
-    url(r'^categories/$', views.budget_categories, name='categories'), # /zcking/categories/
-    url(r'^transactions/$', views.transactions, name='transactions'), # /zcking/transactions/
+    url(r'^wallets/$', views.wallets, name='wallets'), # /wallets/
+    url(r'^wallets/(?P<wallet_id>[0-9]+)$', views.one_wallet, name='one_wallet',), # /wallets/3
+    url(r'^budgets/$', views.budgets, name='budgets'), # /budgets/
+    url(r'^categories/$', views.budget_categories, name='categories'), # /categories/
+    url(r'^transactions/$', views.transactions, name='transactions'), # /transactions/
 ]
