@@ -9,6 +9,7 @@ Implements the views (endpoint handlers) for the Pynny web app.
 
 from django.http import HttpResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
+from django.contrib.auth import logout
 
 from .models import Wallet, BudgetCategory, Transaction, Budget
 
@@ -109,3 +110,21 @@ def profile(request):
 
     # Not authenticated; send to login
     return redirect(reverse('login'))
+
+
+def logout_view(request):
+    '''Handlers user logout requests'''
+    # Is user logged in?
+    if not request.user.is_authenticated():
+        # Not authenticated; send to login
+        return redirect(reverse('login'))
+
+    # User is logged in, so log them out
+    logout(request)
+
+    data = {
+        'alerts': {
+            'success': ['<strong>Done!</strong> You have been logged out successfully']
+        }
+    }
+    return render(request, 'registration/login.html', context=data)

@@ -16,7 +16,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name='index'), # /
     url(r'^login/$', auth_views.login, name='login'), # /login/
-    url(r'^logout/$', auth_views.logout, name='logout'), # /logout/
+    url(r'^logout/$', views.logout_view, name='logout'), # /logout/
     url(r'^profile/$', views.profile, name='profile'), # /profile/
     url(r'^wallets/$', views.wallets, name='wallets'), # /wallets/
     url(r'^wallets/(?P<wallet_id>[0-9]+)$', views.one_wallet, name='one_wallet',), # /wallets/3
