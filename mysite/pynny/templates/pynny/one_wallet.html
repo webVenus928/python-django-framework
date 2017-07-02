@@ -1,0 +1,48 @@
+{% extends 'pynny/base.html' %}
+
+{% block title %}{{ wallet.name.title }} Wallet - Pynny{% endblock %}
+
+{% block content %}
+
+<br />
+
+<button class="btn btn-primary pull-right">
+    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Wallet
+</button>
+
+<br /><br /><br />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 style="display:inline" class="panel-title">{{ wallet.name }}</h3>
+        <form action="{% url 'one_wallet' wallet_id=wallet.id %}" method="POST">
+            {% csrf_token %}
+            <button class="btn btn-xs btn-danger pull-right wallet-delete" type="submit">
+                <span class="glyphicon glyphicon-remove"></span>&nbsp;Delete
+            </button>
+        </form>
+    </div>
+
+    <div class="panel-body">
+        Balance: 
+        {% if wallet.balance < 0 %}
+            <span class="text-danger">
+                ${{ wallet.balance }}
+            </span>
+        {% elif wallet.balance > 0 %}
+            <span class="text-success">
+                ${{ wallet.balance }}
+            </span>
+        {% else %}
+            <span class="text-muted">
+                ${{ wallet.balance }}
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="panel-footer">
+        Created: {{ wallet.created_time }}
+    </div>
+</div>
+
+{% endblock %}
