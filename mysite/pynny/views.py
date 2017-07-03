@@ -10,6 +10,7 @@ Implements the views (endpoint handlers) for the Pynny web app.
 from django.http import HttpResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib.auth import logout
+from datetime import date
 
 from .models import Wallet, BudgetCategory, Transaction, Budget
 
@@ -48,10 +49,17 @@ def one_wallet(request, wallet_id):
     data = {}
 
     # Check if the wallet is owned by the logged in user
-    wallet = get_object_or_404(Wallet, id=wallet_id)
+    try:
+        wallet = Wallet.objects.get(id=wallet_id)
+    except:
+        # DNE
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+        data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That wallet does not exist.']}
+        return render(request, 'pynny/wallets.html', context=data)
+
     if wallet.user != request.user:
         data['wallets'] = Wallet.objects.filter(user=request.user)
-        data['alerts'] = {'errors': ['That wallet does not exist.']}
+        data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That wallet does not exist.']}
         return render(request, 'pynny/wallets.html', context=data)
 
     if request.method == 'POST':
@@ -60,11 +68,13 @@ def one_wallet(request, wallet_id):
 
         # And return them to the wallets page
         data['wallets'] = Wallet.objects.filter(user=request.user)
-        data['alerts'] = {'info': ['Your ' + wallet.name + ' wallet was successfully deleted']}
+        data['alerts'] = {'info': ['<strong>Done!</strong> Your <em>' + wallet.name + '</em> wallet was successfully deleted']}
         return render(request, 'pynny/wallets.html', context=data)
     elif request.method == 'GET':
         # Show the specific Wallet data
         data['wallet'] = wallet
+        data['budgets'] = Budget.objects.filter(wallet=wallet, month=date.today())
+        data['transactions'] = Transaction.objects.filter(wallet=wallet)
         return render(request, 'pynny/one_wallet.html', context=data)
 
 

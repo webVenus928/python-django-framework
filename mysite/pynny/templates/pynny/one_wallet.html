@@ -6,13 +6,11 @@
 
 <br />
 
-<button class="btn btn-primary pull-right">
+<button class="btn btn-primary wallet-create">
     <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Wallet
 </button>
 
-<br /><br /><br />
-
-<div class="panel panel-default">
+<div class="panel panel-primary">
     <div class="panel-heading">
         <h3 style="display:inline" class="panel-title">{{ wallet.name }}</h3>
         <form action="{% url 'one_wallet' wallet_id=wallet.id %}" method="POST">
@@ -43,6 +41,62 @@
     <div class="panel-footer">
         Created: {{ wallet.created_time }}
     </div>
-</div>
+</div> <!-- End of wallet meta info -->
+
+<!-- Show all budgets for this wallet -->
+<h2>Budgets</h2>
+{% if budgets %}
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Goal</th>
+                <th>Month</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for budget in budgets %}
+                <tr>
+                    <td>{{ budget.category.name }}</td>
+                    <td>${{ budget.goal }}</td>
+                    <td>{{ budget.month }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You havn't created any Budgets for this Wallet yet
+    </div>
+{% endif %}
+
+<!-- Show all transaction for this wallet -->
+<h2>Transactions</h2>
+{% if transactions %}
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trans in transactions %}
+                <tr>
+                    <td>${{ trans.amount }}</td>
+                    <td>{{ trans.category.name }}</td>
+                    <td>{{ trans.description }}</td>
+                    <td>{{ trans.created_time }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You havn't recorded any Transactions for this Wallet yet
+    </div>
+{% endif %}
 
 {% endblock %}
