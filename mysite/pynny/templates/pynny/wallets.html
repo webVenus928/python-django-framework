@@ -6,9 +6,11 @@
 
 <br />
 
-<button class="btn btn-primary wallet-create">
-    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Wallet
-</button>
+<a href="{% url 'new_wallet' %}">
+    <button class="btn btn-primary wallet-create">
+        <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Wallet
+    </button>
+</a>
 
 {% if wallets %}
     {% for wallet in wallets %}

@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^logout/$', views.logout_view, name='logout'), # /logout/
     url(r'^profile/$', views.profile, name='profile'), # /profile/
     url(r'^wallets/$', views.wallets, name='wallets'), # /wallets/
+    url(r'^wallets/create/$', views.new_wallet, name='new_wallet'), # /wallets/create
     url(r'^wallets/(?P<wallet_id>[0-9]+)$', views.one_wallet, name='one_wallet',), # /wallets/3
     url(r'^budgets/$', views.budgets, name='budgets'), # /budgets/
     url(r'^categories/$', views.budget_categories, name='categories'), # /categories/

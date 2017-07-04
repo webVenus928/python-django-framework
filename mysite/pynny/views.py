@@ -29,16 +29,44 @@ def index(request):
 def wallets(request):
     '''Display Wallets for a user'''
     # Is user logged in?
-    if request.user.is_authenticated():
+    if not request.user.is_authenticated():
+        # Not authenticated; send to login
+        return redirect(reverse('login'))
+
+    # GET = display user's wallets
+    if request.method == 'GET':
         data = {}
 
         # Get the wallets for this user
         data['wallets'] = Wallet.objects.filter(user=request.user)
 
         return render(request, 'pynny/wallets.html', context=data)
+    # POST = create a new Wallet
+    elif request.method == 'POST':
+        # Get the form data from the request
+        name = request.POST['name']
+        start_balance = float(request.POST['balance'])
 
-    # Not authenticated; send to login
-    return redirect(reverse('login'))
+        # Check if the wallet name exists already
+        if Wallet.objects.filter(user=request.user, name=name):
+            data = {'alerts': {'errors': ['A wallet already exists with that name']}}
+            return render(request, 'pynny/new_wallet.html', context=data)
+
+        # Create the new Wallet
+        Wallet(name=name, balance=start_balance, user=request.user).save()
+        data = {'alerts': {'success': ['New wallet created successfully!']}}
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+        return render(request, 'pynny/wallets.html', context=data)
+
+
+
+def new_wallet(request):
+    '''Display form for creating a new wallet'''
+    # Is user logged in?
+    if not request.user.is_authenticated():
+        return redirect(reverse('login'))
+
+    return render(request, 'pynny/new_wallet.html')
 
 
 def one_wallet(request, wallet_id):

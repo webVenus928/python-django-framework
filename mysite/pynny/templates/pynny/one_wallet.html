@@ -6,9 +6,11 @@
 
 <br />
 
-<button class="btn btn-primary wallet-create">
-    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Wallet
-</button>
+<a href="{% url 'new_wallet' %}">
+    <button class="btn btn-primary wallet-create">
+        <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Wallet
+    </button>
+</a>
 
 <div class="panel panel-primary">
     <div class="panel-heading">
@@ -66,7 +68,7 @@
     </table>
 {% else %}
     <div class="alert alert-info">
-        <strong>Heads up!</strong> You havn't created any Budgets for this Wallet yet
+        <strong>Heads up!</strong> You haven't created any Budgets for this Wallet yet
     </div>
 {% endif %}
 
@@ -95,7 +97,7 @@
     </table>
 {% else %}
     <div class="alert alert-info">
-        <strong>Heads up!</strong> You havn't recorded any Transactions for this Wallet yet
+        <strong>Heads up!</strong> You haven't recorded any Transactions for this Wallet yet
     </div>
 {% endif %}
 
