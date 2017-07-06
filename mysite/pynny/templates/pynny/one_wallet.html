@@ -44,7 +44,7 @@
         <thead>
             <tr>
                 <th>Category</th>
-                <th>Goal</th>
+                <th>Used / Goal</th>
                 <th>Month</th>
             </tr>
         </thead>
@@ -52,7 +52,7 @@
             {% for budget in budgets %}
                 <tr class="tr-link {% budget_class budget.balance budget.goal %}" data-href="#">
                     <td>{{ budget.category.name }}</td>
-                    <td>${{ budget.goal }}</td>
+                    <td>${{ budget.balance }} / ${{ budget.goal }}</td>
                     <td>{{ budget.month }}</td>
                 </tr>
             {% endfor %}
