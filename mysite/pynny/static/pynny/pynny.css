@@ -2,15 +2,23 @@
     margin-bottom: 5px;
 }
 
-.wallet-delete {
+.wallet-delete, .category-delete {
     margin-top: -20px;
 }
 
-.wallet-create {
+.wallet-create, .category-create {
     margin-bottom: 20px;
 }
 
 .table-links tbody tr:hover td, .table-links tbody tr:hover th {
   background-color: #cfd8dc;
   cursor: pointer;
+}
+
+#new_category_form {
+    margin-top: 30px;
+}
+
+.category-check {
+    padding-left: 3%;
 }

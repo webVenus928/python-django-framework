@@ -132,12 +132,83 @@ def transactions(request):
 def budget_categories(request):
     '''View BudgetCategories for a user'''
     # Is user logged in?
-    if request.user.is_authenticated():
+    if not request.user.is_authenticated():
+        # Not authenticated; send to login
+        return redirect(reverse('login'))
+
+    # GET = display user's categories
+    if request.method == 'GET':
         data = {}
+
+        # Get the wallets for this user
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+
+        return render(request, 'pynny/categories.html', context=data)
+    # POST = create a new BudgetCategory
+    elif request.method == 'POST':
+        # Get the form data from the request
+        print(request.POST)
+        name = request.POST['name']
+        is_income = False
+        if 'is_income' in request.POST:
+            is_income = True
+
+        # Check if the category name exists already
+        if BudgetCategory.objects.filter(user=request.user, name=name):
+            data = {'alerts': {'errors': ['<strong>Oops!</strong> A category already exists with that name']}}
+            return render(request, 'pynny/new_category.html', context=data)
+
+        # Create the new Wallet
+        BudgetCategory(name=name, is_income=is_income, user=request.user).save()
+        data = {'alerts': {'success': ['<strong>Done!</strong> New Category created successfully!']}}
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
         return render(request, 'pynny/categories.html', context=data)
 
-    # Not authenticated; send to login
-    return redirect(reverse('login'))
+def new_category(request):
+    '''Create a new BudgetCategory form'''
+    # Is user logged in?
+    if not request.user.is_authenticated():
+        return redirect(reverse('login'))
+
+    return render(request, 'pynny/new_category.html')
+
+
+def one_category(request, category_id):
+    '''View a specific BudgetCategory'''
+    if not request.user.is_authenticated:
+        return redirect(reverse('login'))
+
+    data = {}
+
+    # Check if the category is owned by the logged in user
+    try:
+        category = BudgetCategory.objects.get(id=category_id)
+    except:
+        # DNE
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Category does not exist.']}
+        return render(request, 'pynny/categories.html', context=data)
+
+    if category.user != request.user:
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Category does not exist.']}
+        return render(request, 'pynny/categories.html', context=data)
+
+    if request.method == "POST":
+        print('Deleting...')
+        # Delete the Category
+        category.delete()
+
+        # And return them to the categories page
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['alerts'] = {'info': ['<strong>Done!</strong> Your <em>' + category.name + '</em> Category was deleted successfully']}
+        return render(request, 'pynny/categories.html', context=data)
+    elif request.method == 'GET':
+        # Show the specific Category data
+        data['category'] = category
+        data['budgets'] = Budget.objects.filter(category=category, month__contains=date.strftime(date.today(), '%Y-%m'))
+        data['transactions'] = Transaction.objects.filter(category=category)
+        return render(request, 'pynny/one_category.html', context=data)
 
 
 def profile(request):

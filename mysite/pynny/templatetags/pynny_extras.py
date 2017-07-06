@@ -35,3 +35,9 @@ def wallet_class(balance):
     elif balance < 0:
         return 'danger'
     return 'default'
+
+@register.simple_tag
+def category_class(is_income):
+    if is_income:
+        return 'success'
+    return 'danger'

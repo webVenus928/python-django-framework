@@ -23,5 +23,7 @@ urlpatterns = [
     url(r'^wallets/(?P<wallet_id>[0-9]+)$', views.one_wallet, name='one_wallet',), # /wallets/3
     url(r'^budgets/$', views.budgets, name='budgets'), # /budgets/
     url(r'^categories/$', views.budget_categories, name='categories'), # /categories/
+    url(r'^categories/create/$', views.new_category, name='new_category'), # /categories/create
+    url(r'^categories/(?P<category_id>[0-9]+)$', views.one_category, name='one_category'), # /categories/5
     url(r'^transactions/$', views.transactions, name='transactions'), # /transactions/
 ]
