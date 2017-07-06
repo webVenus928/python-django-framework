@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+{% load pynny_extras %}
 <html>
     <head>
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="stylesheet" href="{% static 'pynny/pynny.css' %}">
+        <script type="text/javascript" src="{% static 'pynny/script.js' %}"></script>
     </head>
 
     <body>

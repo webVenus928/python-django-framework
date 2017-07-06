@@ -9,3 +9,8 @@
 .wallet-create {
     margin-bottom: 20px;
 }
+
+.table-links tbody tr:hover td, .table-links tbody tr:hover th {
+  background-color: #cfd8dc;
+  cursor: pointer;
+}

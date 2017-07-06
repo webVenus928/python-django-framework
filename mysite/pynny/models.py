@@ -83,6 +83,7 @@ class Budget(models.Model):
     goal = models.DecimalField(max_digits=20, decimal_places=2)
     month = models.DateField(default=date.today, blank=True)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    balance = models.DecimalField(max_digits=20, decimal_places=2, blank=True, default=0.0)
     user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
 
     def __str__(self):

@@ -51,8 +51,8 @@
     {% endfor %}
 {% else %}
     <div class="alert alert-info">
-        <strong>Ahoy!</strong> You haven't created any Wallets yet. Get started 
-        by clicking <em>New Wallet</em>.
+        <strong>Heads up!</strong> You haven't created any Wallets yet. Get started 
+        by clicking <a href="{% url 'new_wallet' %}">New Wallet</a>.
     </div>
 {% endif %}
 

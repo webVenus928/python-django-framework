@@ -12,7 +12,7 @@
     </button>
 </a>
 
-<div class="panel panel-primary">
+<div class="panel panel-{% wallet_class wallet.balance %}">
     <div class="panel-heading">
         <h3 style="display:inline" class="panel-title">{{ wallet.name }}</h3>
         <form action="{% url 'one_wallet' wallet_id=wallet.id %}" method="POST">
@@ -25,19 +25,9 @@
 
     <div class="panel-body">
         Balance: 
-        {% if wallet.balance < 0 %}
-            <span class="text-danger">
-                ${{ wallet.balance }}
-            </span>
-        {% elif wallet.balance > 0 %}
-            <span class="text-success">
-                ${{ wallet.balance }}
-            </span>
-        {% else %}
-            <span class="text-muted">
-                ${{ wallet.balance }}
-            </span>
-        {% endif %}
+        <span class="text-{% wallet_class wallet.balance %}">
+            ${{ wallet.balance }}
+        </span>
     </div>
 
     <div class="panel-footer">
@@ -45,10 +35,12 @@
     </div>
 </div> <!-- End of wallet meta info -->
 
+<hr />
+
 <!-- Show all budgets for this wallet -->
 <h2>Budgets</h2>
 {% if budgets %}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover table-links">
         <thead>
             <tr>
                 <th>Category</th>
@@ -58,7 +50,7 @@
         </thead>
         <tbody>
             {% for budget in budgets %}
-                <tr>
+                <tr class="tr-link {% budget_class budget.balance budget.goal %}" data-href="#">
                     <td>{{ budget.category.name }}</td>
                     <td>${{ budget.goal }}</td>
                     <td>{{ budget.month }}</td>
@@ -68,9 +60,12 @@
     </table>
 {% else %}
     <div class="alert alert-info">
-        <strong>Heads up!</strong> You haven't created any Budgets for this Wallet yet
+        <strong>Heads up!</strong> You haven't created any Budgets for this Wallet yet. You can 
+        create one <a href="#">here</a>.
     </div>
 {% endif %}
+
+<br />
 
 <!-- Show all transaction for this wallet -->
 <h2>Transactions</h2>
@@ -97,7 +92,8 @@
     </table>
 {% else %}
     <div class="alert alert-info">
-        <strong>Heads up!</strong> You haven't recorded any Transactions for this Wallet yet
+        <strong>Heads up!</strong> You haven't recorded any Transactions for this Wallet yet. You 
+        can create one <a href="#">here</a>.
     </div>
 {% endif %}
 

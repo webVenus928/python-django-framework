@@ -45,6 +45,7 @@ def wallets(request):
     elif request.method == 'POST':
         # Get the form data from the request
         name = request.POST['name']
+        start_balance = 0
         start_balance = float(request.POST['balance'])
 
         # Check if the wallet name exists already
@@ -54,7 +55,7 @@ def wallets(request):
 
         # Create the new Wallet
         Wallet(name=name, balance=start_balance, user=request.user).save()
-        data = {'alerts': {'success': ['New wallet created successfully!']}}
+        data = {'alerts': {'success': ['<strong>Done!</strong> New wallet created successfully!']}}
         data['wallets'] = Wallet.objects.filter(user=request.user)
         return render(request, 'pynny/wallets.html', context=data)
 
@@ -101,7 +102,7 @@ def one_wallet(request, wallet_id):
     elif request.method == 'GET':
         # Show the specific Wallet data
         data['wallet'] = wallet
-        data['budgets'] = Budget.objects.filter(wallet=wallet, month=date.today())
+        data['budgets'] = Budget.objects.filter(wallet=wallet, month__contains=date.strftime(date.today(), '%Y-%m'))
         data['transactions'] = Transaction.objects.filter(wallet=wallet)
         return render(request, 'pynny/one_wallet.html', context=data)
 

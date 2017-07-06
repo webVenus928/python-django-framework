@@ -29,9 +29,9 @@ class BudgetAdmin(admin.ModelAdmin):
     '''Admin model for Budgets'''
     fieldsets = [
         (None, {'fields': ['user', 'wallet']}),
-        ('Budget Information', {'fields': ['category', 'goal', 'month']})
+        ('Budget Information', {'fields': ['category', 'goal', 'balance', 'month']})
     ]
-    list_display = ('user', 'wallet', 'category', 'goal', 'month')
+    list_display = ('user', 'wallet', 'category', 'balance', 'goal', 'month')
     list_filter = ['user__username', 'month']
     search_fields = ['user__username', 'category__name', 'wallet__name']
 
