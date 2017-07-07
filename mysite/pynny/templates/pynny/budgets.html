@@ -4,7 +4,43 @@
 
 {% block content %}
 
+<br />
 
+<a href="{% url 'new_budget' %}">
+    <button class="btn btn-primary wallet-create">
+        <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Budget
+    </button>
+</a>
 
+{% if budgets %}
+    {% for budget in budgets %}
+        <div class="panel panel-{% budget_class budget %}">
+            <div class="panel-heading">
+                <a href="{% url 'one_budget' budget_id=budget.id %}">
+                    <h3 style="display:inline" class="panel-title">{{ budget.category.name }} - {{ budget.wallet.name }}</h3>
+                </a>
+                <form action="{% url 'one_budget' budget_id=budget.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-xs btn-danger pull-right budget-delete" type="submit">
+                        <span class="glyphicon glyphicon-remove"></span>&nbsp;Delete
+                    </button>
+                </form>
+            </div>
+
+            <div class="panel-body">
+                ...
+            </div>
+
+            <div class="panel-footer">
+                Month: {{ budget.month }}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't created any Budgets yet. Get started 
+        by clicking <a href="{% url 'new_budget' %}">New Budget</a>.
+    </div>
+{% endif %}
 
 {% endblock %}

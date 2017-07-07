@@ -18,16 +18,6 @@ def get_item(dictionary, key):
     `{{ my_dict|get_item:item.NAME }}'''
     return dictionary.get(key)
 
-
-@register.simple_tag
-def budget_class(budget_balance, budget_goal):
-    if budget_balance > budget_goal:
-        return 'danger'
-    elif budget_balance > (budget_goal * Decimal(0.8)):
-        return 'warning'
-    else:
-        return 'success'
-
 @register.simple_tag
 def wallet_class(balance):
     if balance > 0:
@@ -41,3 +31,20 @@ def category_class(is_income):
     if is_income:
         return 'success'
     return 'danger'
+
+@register.simple_tag
+def budget_class(budget):
+    goal = budget.goal
+    bal = budget.balance
+    if budget.category.is_income:
+        if bal >= goal:
+            return 'success'
+        elif bal >= (goal * Decimal(0.5)):
+            return 'warning'
+        return 'danger'
+
+    if bal >= goal:
+        return 'danger'
+    elif bal >= (goal * Decimal(0.8)):
+        return 'warning'
+    return 'success'

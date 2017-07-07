@@ -1,0 +1,53 @@
+{% extends 'pynny/base.html' %}
+
+{% block title %}New Budget - Pynny{% endblock %}
+
+{% block content %}
+
+<h1>New Budget</h1>
+
+<form action="{% url 'budgets' %}" autocomplete="off" method="POST">
+    {% csrf_token %}
+                        
+    <div class="input-group">
+        <label for="category">Budget Category: </label>
+        <select name="category" class="form-control">
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br />
+
+    <div class="input-group">
+        <label for="wallet">Wallet: </label>
+        <select name="wallet" class="form-control">
+            {% for wallet in wallets %}
+                <option value="{{ wallet.id }}">{{ wallet.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br />
+
+    <label for="goal">Goal: </label>
+    <div class="input-group">
+        <span class="input-group-addon">$</span>
+        <input type="number" class="form-control" step=0.01 value=0 name="goal">
+    </div>
+
+    <br />
+
+    <label for="start_balance">Initial Balance: </label>
+    <div class="input-group">
+        <span class="input-group-addon">$</span>
+        <input type="number" class="form-control" step=0.01 value=0 name="start_balance">
+    </div>
+
+    <br />
+
+    <button class="btn btn-md btn-primary" type="submit">Create</button>
+</form>
+
+{% endblock %}

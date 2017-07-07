@@ -19,7 +19,7 @@
                 <a href="{% url 'one_wallet' wallet_id=wallet.id %}">
                     <h3 style="display:inline" class="panel-title">{{ wallet.name }}</h3>
                 </a>
-                <form action="{% url 'one_wallet' wallet_id=wallet.id %}" method="DELETE">
+                <form action="{% url 'one_wallet' wallet_id=wallet.id %}" method="POST">
                     {% csrf_token %}
                     <button class="btn btn-xs btn-danger pull-right wallet-delete" type="submit">
                         <span class="glyphicon glyphicon-remove"></span>&nbsp;Delete

@@ -50,7 +50,7 @@
         </thead>
         <tbody>
             {% for budget in budgets %}
-                <tr class="tr-link {% budget_class budget.balance budget.goal %}" data-href="#">
+                <tr class="tr-link {% budget_class budget %}" data-href="#">
                     <td>{{ budget.category.name }}</td>
                     <td>${{ budget.balance }} / ${{ budget.goal }}</td>
                     <td>{{ budget.month }}</td>
