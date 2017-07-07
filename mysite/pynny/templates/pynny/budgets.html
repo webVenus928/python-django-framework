@@ -32,7 +32,7 @@
             </div>
 
             <div class="panel-footer">
-                Month: {{ budget.month }}
+                {% get_month budget.month %}
             </div>
         </div>
     {% endfor %}

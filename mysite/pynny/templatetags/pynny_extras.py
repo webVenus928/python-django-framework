@@ -8,6 +8,7 @@ in Django templates.
 '''
 
 from django.template.defaultfilters import register
+from datetime import date
 
 from decimal import Decimal
 
@@ -48,3 +49,7 @@ def budget_class(budget):
     elif bal >= (goal * Decimal(0.8)):
         return 'warning'
     return 'success'
+
+@register.simple_tag
+def get_month(d):
+    return date.strftime(d, '%B, %Y')
