@@ -12,6 +12,8 @@
     </button>
 </a>
 
+<h1>Categories</h1>
+
 {% if categories %}
     <table class="table table-striped table-hover table-links">
         <thead>
@@ -22,8 +24,8 @@
         </thead>
         <tbody>
             {% for category in categories %}
-                <tr class="{% category_class category.is_income %} tr-link" data-href="{% url 'one_category' category_id=category.id %}">
-                    <td>{{ category.name }}</td>
+                <tr class="tr-link" data-href="{% url 'one_category' category_id=category.id %}">
+                    <td class="text-{% category_class category.is_income %}">{{ category.name }}</td>
                     {% if category.is_income %}
                         <td><span class="glyphicon glyphicon-ok category-check"></span></td>
                     {% else %}
