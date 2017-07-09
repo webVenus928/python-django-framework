@@ -58,6 +58,28 @@ def new_budget(request):
     data['categories'] = BudgetCategory.objects.filter(user=request.user)
     data['wallets'] = Wallet.objects.filter(user=request.user)
 
+    # Check if they have any categories or wallets first
+    if not data['categories']:
+        data = {
+            'alerts': {
+                'errors': [
+                    '<strong>Oy!</strong> You don\'t have any Categories yet! You need to create a Category before you can create a Budget!'
+                ]
+            },
+        }
+        return render(request, 'pynny/new_category.html', context=data)
+
+    if not data['wallets']:
+        data = {
+            'alerts': {
+                'errors': [
+                    '<strong>Oy!</strong> You don\'t have any Wallets yet! You need to create a Wallet before you can create a Budget!'
+                ]
+            },
+        }
+        return render(request, 'pynny/new_wallet.html', context=data)
+
+    # They have a wallet and category so continue
     return render(request, 'pynny/new_budget.html', context=data)
 
 

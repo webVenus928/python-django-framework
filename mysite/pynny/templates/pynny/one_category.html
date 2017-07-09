@@ -36,7 +36,7 @@
         </thead>
         <tbody>
             {% for budget in budgets %}
-                <tr class="tr-link {% budget_class budget.balance budget.goal %}" data-href="#">
+                <tr class="tr-link {% budget_class budget %}" data-href="{% url 'one_budget' budget_id=budget.id %}">
                     <td>{{ budget.category.name }}</td>
                     <td>${{ budget.balance }} / ${{ budget.goal }}</td>
                     <td>{{ budget.month }}</td>
@@ -47,7 +47,7 @@
 {% else %}
     <div class="alert alert-info">
         <strong>Heads up!</strong> You haven't created any Budgets for this Category yet. You can 
-        create one <a href="#">here</a>.
+        create one <a href="{% url 'new_budget' %}">here</a>.
     </div>
 {% endif %}
 

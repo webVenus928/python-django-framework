@@ -14,7 +14,7 @@
 
 {% if budgets %}
     {% for budget in budgets %}
-        <div class="panel panel-{% budget_class budget %}">
+        <div class="panel panel-{% budget_class budget %} budget-panel">
             <div class="panel-heading">
                 <a href="{% url 'one_budget' budget_id=budget.id %}">
                     <h3 style="display:inline" class="panel-title">{{ budget.category.name }} - {{ budget.wallet.name }}</h3>
@@ -28,7 +28,16 @@
             </div>
 
             <div class="panel-body">
-                ...
+                <p>Balance: ${{ budget.balance }}</p>
+                <p>Goal: ${{ budget.goal }}</p>
+                <p>Category: <a href="{% url 'one_category' category_id=budget.category.id %}">
+                    {{ budget.category.name }}
+                    </a>
+                </p>
+                <p>Wallet: <a href="{% url 'one_wallet' wallet_id=budget.wallet.id %}">
+                    {{ budget.wallet.name }}
+                    </a>
+                </p>
             </div>
 
             <div class="panel-footer">
