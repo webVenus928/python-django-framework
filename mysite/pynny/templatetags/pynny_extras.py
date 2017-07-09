@@ -53,3 +53,25 @@ def budget_class(budget):
 @register.simple_tag
 def get_month(d):
     return date.strftime(d, '%B, %Y')
+
+@register.simple_tag
+def transaction_class(transaction):
+    '''Returns a Bootstrap class string for a Transaction'''
+    if transaction.amount == 0:
+        return 'default'
+
+    is_income = transaction.category.is_income
+    if is_income:
+        if transaction.amount >= 0:
+            return 'success'
+        return 'danger'
+    else:
+        if transaction.amount >= 0:
+            return 'danger'
+        return 'success'
+
+
+@register.simple_tag
+def shorten_string(string, limit):
+    '''Returns the string, shortened to limit chars and with '...' appended'''
+    return string[:limit] + '...'

@@ -1,10 +1,57 @@
 {% extends 'pynny/base.html' %}
 
-{% block title %}Transaction - Pynny{% endblock %}
+{% block title %}Transactions - Pynny{% endblock %}
 
 {% block content %}
 
+<br />
 
+<a href="{% url 'new_transaction' %}">
+    <button class="btn btn-primary transaction-create">
+        <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Transaction
+    </button>
+</a>
 
+<h1>Transaction</h1>
+
+{% if transactions %}
+    <table class="table table-striped table-hover table-links">
+        <thead>
+            <tr>
+                <th>Wallet</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Recorded</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+                <tr class="tr-link" data-href="{% url 'one_transaction' transaction_id=transaction.id %}">
+                    <td class="text-{% wallet_class transaction.wallet.balance %}">
+                        {{ transaction.wallet.name }}
+                    </td>
+                    <td class="text-{% category_class transaction.category.is_income %}">
+                        {{ transaction.category.name }}
+                    </td>
+                    <td class="text-{% transaction_class transaction %}">
+                        ${{ transaction.amount }}
+                    </td>
+                    <td>
+                        {% shorten_string transaction.description 20 %}
+                    </td>
+                    <td>
+                        {{ transaction.created_time }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't recorded any Transactions yet. Get started 
+        by clicking <a href="{% url 'new_transaction' %}">New Transaction</a>.
+    </div>
+{% endif %}
 
 {% endblock %}

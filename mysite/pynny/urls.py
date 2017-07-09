@@ -28,4 +28,6 @@ urlpatterns = [
     url(r'^categories/create/$', category_views.new_category, name='new_category'), # /categories/create
     url(r'^categories/(?P<category_id>[0-9]+)$', category_views.one_category, name='one_category'), # /categories/5
     url(r'^transactions/$', transaction_views.transactions, name='transactions'), # /transactions/
+    url(r'^transactions/(?P<transaction_id>[0-9]+)$', transaction_views.one_transaction, name='one_transaction'), # /transactions/9
+    url(r'^transactions/create/$', transaction_views.new_transaction, name='new_transaction'), # /transactions/create
 ]
