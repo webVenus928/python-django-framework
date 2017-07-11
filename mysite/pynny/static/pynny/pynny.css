@@ -2,11 +2,11 @@
     margin-bottom: 5px;
 }
 
-.wallet-delete, .category-delete, .budget-delete {
+.wallet-delete, .category-delete, .budget-delete, .transaction-delete {
     margin-top: -20px;
 }
 
-.wallet-create, .category-create, .budget-create {
+.wallet-create, .category-create, .budget-create, .transaction-create {
     margin-bottom: 20px;
 }
 

@@ -6,8 +6,8 @@ Author: Zachary King
 Implements the views/handlers for Transaction-related requetss
 '''
 
-from django.shortcuts import render, redirect, reverse
 from datetime import date, datetime
+from django.shortcuts import render, redirect, reverse
 
 from ..models import Transaction, BudgetCategory, Wallet
 
@@ -77,6 +77,36 @@ def new_transaction(request):
     data['default_date'] = date.strftime(date.today(), '%Y-%m-%d')
     return render(request, 'pynny/new_transaction.html', context=data)
 
-def one_transaction(request):
+def one_transaction(request, transaction_id):
     '''View for a single Transaction'''
-    pass
+    if not request.user.is_authenticated():
+        return redirect(reverse('login'))
+
+    data = {}
+
+    # Check if transaction is owned by user
+    try:
+        transaction = Transaction.objects.get(id=transaction_id)
+    except Transaction.DoesNotExist:
+        # DNE
+        data['transactions'] = Transaction.objects.filter(user=request.user)
+        data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
+        return render(request, 'pynny/transactions.html', context=data)
+
+    if transaction.user != request.user:
+        data['transactions'] = Transaction.objects.filter(user=request.user)
+        data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
+        return render(request, 'pynny/transactions.html', context=data)
+
+    if request.method == "POST":
+        # Delete the Transaction
+        transaction.delete()
+
+        # And return them to the Transactions page
+        data['transactions'] = Transaction.objects.filter(user=request.user)
+        data['alerts'] = {'info': ['<strong>Done!</strong> Transaction was deleted successfully']}
+        return render(request, 'pynny/transactions.html', context=data)
+    elif request.method == 'GET':
+        # Show the specific Transaction data
+        data['transaction'] = transaction
+        return render(request, 'pynny/one_transaction.html', context=data)
