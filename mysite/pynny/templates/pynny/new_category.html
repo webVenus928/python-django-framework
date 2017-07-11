@@ -6,6 +6,8 @@
 
 <form action="{% url 'categories' %}" autocomplete="off" method="POST" id="new_category_form">
     {% csrf_token %}
+
+    <input type="hidden" name="action" value="create" />
                         
     <div class="input-group">
         <label for="name">Category Name: </label>

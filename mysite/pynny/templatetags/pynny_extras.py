@@ -8,7 +8,7 @@ in Django templates.
 '''
 
 from django.template.defaultfilters import register
-from datetime import date
+from datetime import date, datetime
 
 from decimal import Decimal
 
@@ -55,6 +55,10 @@ def get_month(d):
     return date.strftime(d, '%B, %Y')
 
 @register.simple_tag
+def fmt_time(t):
+    return datetime.strftime(t, '%Y-%m-%d')
+
+@register.simple_tag
 def transaction_class(transaction):
     '''Returns a Bootstrap class string for a Transaction'''
     if transaction.amount == 0:
@@ -74,4 +78,6 @@ def transaction_class(transaction):
 @register.simple_tag
 def shorten_string(string, limit):
     '''Returns the string, shortened to limit chars and with '...' appended'''
-    return string[:limit] + '...'
+    if len(string) <= limit:
+        return string
+    return string[:limit-3] + '...'

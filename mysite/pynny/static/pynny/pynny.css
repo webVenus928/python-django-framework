@@ -22,3 +22,7 @@
 .category-check {
     padding-left: 3%;
 }
+
+.form-inline {
+    display: inline;
+}

@@ -7,6 +7,8 @@
 <form action="{% url 'transactions' %}" autocomplete="off" method="POST" id="new_transaction_form">
     {% csrf_token %}
 
+    <input type="hidden" name="action" value="create" />
+
     <div class="input-group">
         <label for="category">Category: </label>
         <select name="category" class="form-control">
