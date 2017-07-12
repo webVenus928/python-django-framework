@@ -12,6 +12,7 @@ env:
 
 # Install dependencies
 install: 
+    - pip install mysqlclient
     - pip install -q Django==$DJANGO
 
 before_script:
