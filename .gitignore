@@ -2,6 +2,7 @@
 *.sqlite3
 mysite/pynny/migrations
 *.sql
+*.cnf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
