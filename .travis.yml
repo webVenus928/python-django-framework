@@ -4,6 +4,9 @@ python:
     - "3.5"
     - "3.6"
 
+dist: trusty
+sudo: required
+
 services:
     - msyql
 
@@ -16,8 +19,7 @@ install:
     - pip install -q Django==$DJANGO
 
 before_script:
-    - python mysite/manage.py makemigrations
-    - python mysite/manage.py migrate
+    - mysql -e 'SELECT database djangodb;'
 
 script:
     - python mysite/manage.py test
