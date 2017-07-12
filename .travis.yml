@@ -5,18 +5,12 @@ python:
     - "3.6"
 
 services:
-    - mysql
+    - sqlite3
 
 env:
-    -DJANGO=1.11 DB=mysql
+    -DJANGO=1.11 DB=sqlite3
 
 # Install dependencies
 install: 
     - pip install -r requirements.txt
 
-before_script:
-    - mysql -e 'create database test;' -u root
-
-# Command to run tests
-script: 
-    - python mysite/manage.py test
