@@ -19,4 +19,4 @@ before_script:
 
 # Command to run tests
 script: 
-    - python manage.py test
+    - python mysite/manage.py test
