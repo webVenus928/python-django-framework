@@ -8,11 +8,11 @@ services:
     - sqlite3
 
 env:
-    -DJANGO=1.11 DB=sqlite3
+    - DJANGO=1.11 DB=sqlite3
 
 # Install dependencies
 install: 
-    - pip install -r requirements.txt
+    - pip install -q Django==$DJANGO
 
 script:
     - python mysite/manage.py test
