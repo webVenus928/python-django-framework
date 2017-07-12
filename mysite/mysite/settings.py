@@ -79,8 +79,9 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'djangodb',
         'OPTIONS': {
-            'read_default_file': 'pynny.cnf',
+            'read_default_file': 'my.cnf',
         },
     }
 }
