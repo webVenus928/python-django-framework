@@ -40,7 +40,7 @@ def budget_class(budget):
     if budget.category.is_income:
         if bal >= goal:
             return 'success'
-        elif bal >= (goal * Decimal(0.5)):
+        elif bal >= (goal * Decimal(0.8)):
             return 'warning'
         return 'danger'
 
