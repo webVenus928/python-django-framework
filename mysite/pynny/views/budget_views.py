@@ -7,8 +7,9 @@ Implements the views/handlers for Budget-related requests
 '''
 
 from django.shortcuts import render, redirect, reverse
+import decimal
 
-from ..models import Budget, BudgetCategory, Wallet
+from ..models import Budget, BudgetCategory, Wallet, Transaction
 
 def budgets(request):
     '''Display Budgets for a user'''
@@ -30,11 +31,15 @@ def budgets(request):
         # Get the form data from the request
         _category = int(request.POST['category'])
         _goal = float(request.POST['goal'])
-        _start_balance = float(request.POST['start_balance'])
+        _start_balance = decimal.Decimal(0.0)
         _wallet = int(request.POST['wallet'])
 
         category = BudgetCategory.objects.get(id=_category)
         wallet = Wallet.objects.get(id=_wallet)
+
+        # Calculate the starting balance
+        for transaction in Transaction.objects.filter(category=category):
+            _start_balance += transaction.amount
 
         # Check if the budget already exists
         if Budget.objects.filter(user=request.user, category=category, wallet=wallet):
@@ -143,4 +148,5 @@ def one_budget(request, budget_id):
     elif request.method == 'GET':
         # Show the specific Budget data
         data['budget'] = budget
+        data['transactions'] = Transaction.objects.filter(category=budget.category)
         return render(request, 'pynny/one_budget.html', context=data)
