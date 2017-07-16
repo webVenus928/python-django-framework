@@ -32,6 +32,7 @@
 
                 <form action="{% url 'one_wallet' wallet_id=wallet.id %}" method="POST">
                     {% csrf_token %}
+                    <input type="hidden" name="action" value="delete" />
                     <button class="btn btn-xs btn-danger pull-right wallet-delete" type="submit">
                         <span class="glyphicon glyphicon-remove"></span>&nbsp;Delete
                     </button>
