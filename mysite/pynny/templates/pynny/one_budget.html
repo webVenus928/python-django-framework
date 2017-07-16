@@ -77,7 +77,7 @@
 {% else %}
     <div class="alert alert-info">
         <strong>Heads up!</strong> You haven't recorded any Transactions for the Wallet and Category 
-        this Budget refers to. You can create one <a href="#">here</a>.
+        this Budget refers to. You can create one <a href="{% url 'new_transaction' %}">here</a>.
     </div>
 {% endif %}
 

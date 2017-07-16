@@ -93,7 +93,7 @@
 {% else %}
     <div class="alert alert-info">
         <strong>Heads up!</strong> You haven't recorded any Transactions for this Wallet yet. You 
-        can create one <a href="#">here</a>.
+        can create one <a href="{% url 'new_transaction' %}">here</a>.
     </div>
 {% endif %}
 
