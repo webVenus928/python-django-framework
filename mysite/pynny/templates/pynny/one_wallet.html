@@ -81,7 +81,7 @@
 <!-- Show all transaction for this wallet -->
 <h2>Transactions</h2>
 {% if transactions %}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover table-links">
         <thead>
             <tr>
                 <th>Amount</th>
@@ -92,7 +92,7 @@
         </thead>
         <tbody>
             {% for trans in transactions %}
-                <tr>
+                <tr class="tr-link" data-href="{% url 'one_transaction' transaction_id=trans.id %}">
                     <td>${{ trans.amount }}</td>
                     <td>{{ trans.category.name }}</td>
                     <td>{{ trans.description }}</td>
