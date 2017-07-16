@@ -11,5 +11,66 @@
   </p>
 </div>
 
+<div class="row">
+  <div class="col-md-4">
+    <canvas id="budgetsCanvas"></canvas>
+  </div>
+</div>
+
+
+<script>
+var ctx = document.getElementById("budgetsCanvas").getContext('2d');
+var budget_colors = [];
+{% for col in budget_colors %}
+  budget_colors.push("{{ col }}");
+{% endfor %}
+
+var categories = [];
+{% for cat in budget_categories %}
+  categories.push("{{ cat }}");
+{% endfor %}
+
+var budget_goal_data = [];
+{% for data in budget_goal_data %}
+  budget_goal_data.push({{ data }});
+{% endfor %}
+
+var budget_balance_data = [];
+{% for data in budget_balance_data %}
+  budget_balance_data.push({{ data }});
+{% endfor %}
+
+var budgetChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: budget_goal_data,
+        backgroundColor: budget_colors,
+        label: 'Budget Goals'
+      },
+      {
+        data: budget_balance_data,
+        backgroundColor: budget_colors,
+        label: 'Budget Balances'
+      }],
+      labels: categories,
+    },
+    options: {
+      responsive: true,
+      legend: {
+        positition: 'bottom',
+      },
+      title: {
+        display: true,
+        text: 'Budgets Overview'
+      },
+      animation: {
+        animateScale: true,
+        animateRotate: true
+      }
+    }
+});
+</script>
+
 
 {% endblock %}

@@ -9,6 +9,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="stylesheet" href="{% static 'pynny/pynny.css' %}">
         <script type="text/javascript" src="{% static 'pynny/script.js' %}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script> <!-- Chart.js -->
     </head>
 
     <body>
@@ -51,5 +52,8 @@
             {% block content %}
             {% endblock %}
         </div>
+
+        {% block script %}
+        {% endblock %}
     </body>
 </html>
