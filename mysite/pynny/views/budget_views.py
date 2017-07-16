@@ -105,13 +105,41 @@ def one_budget(request, budget_id):
         return render(request, 'pynny/budgets.html', context=data)
 
     if request.method == "POST":
-        # Delete the Budget
-        budget.delete()
+        # What kind of action?
+        action = request.POST['action'].lower()
 
-        # And return them to the categories page
-        data['budgets'] = Budget.objects.filter(user=request.user)
-        data['alerts'] = {'info': ['<strong>Done!</strong> Budget was deleted successfully']}
-        return render(request, 'pynny/budgets.html', context=data)
+        if action == 'delete':
+            # Delete the Budget
+            budget.delete()
+
+            # And return them to the budgets page
+            data['budgets'] = Budget.objects.filter(user=request.user)
+            data['alerts'] = {'info': ['<strong>Done!</strong> Budget was deleted successfully']}
+            return render(request, 'pynny/budgets.html', context=data)
+        elif action == 'edit':
+            # Render the edit_budget view
+            data['budget'] = budget
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            data['wallets'] = Wallet.objects.filter(user=request.user)
+            return render(request, 'pynny/edit_budget.html', context=data)
+        elif action == 'edit_complete':
+            # Get the form data from the request
+            _category = int(request.POST['category'])
+            _wallet = int(request.POST['wallet'])
+            _goal = float(request.POST['goal'])
+
+            category = BudgetCategory.objects.get(id=_category)
+            wallet = Wallet.objects.get(id=_wallet)
+
+            # Edit the Budget
+            budget.category = category
+            budget.wallet = wallet
+            budget.goal = _goal
+            budget.save()
+
+            data = {'alerts': {'success': ['<strong>Done!</strong> Budget updated successfully!']}}
+            data['budgets'] = Budget.objects.filter(user=request.user)
+            return render(request, 'pynny/budgets.html', context=data)
     elif request.method == 'GET':
         # Show the specific Budget data
         data['budget'] = budget

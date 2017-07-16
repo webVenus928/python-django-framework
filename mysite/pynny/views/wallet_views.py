@@ -77,13 +77,32 @@ def one_wallet(request, wallet_id):
         return render(request, 'pynny/wallets.html', context=data)
 
     if request.method == 'POST':
-        # Delete the wallet
-        wallet.delete()
+        # What action?
+        action = request.POST['action'].lower()
 
-        # And return them to the wallets page
-        data['wallets'] = Wallet.objects.filter(user=request.user)
-        data['alerts'] = {'info': ['<strong>Done!</strong> Your <em>' + wallet.name + '</em> wallet was successfully deleted']}
-        return render(request, 'pynny/wallets.html', context=data)
+        if action == 'delete':
+            # Delete the wallet
+            wallet.delete()
+
+            # And return them to the wallets page
+            data['wallets'] = Wallet.objects.filter(user=request.user)
+            data['alerts'] = {'info': ['<strong>Done!</strong> Your <em>' + wallet.name + '</em> wallet was successfully deleted']}
+            return render(request, 'pynny/wallets.html', context=data)
+        elif action == 'edit':
+            # Render the edit_wallet view
+            data['wallet'] = wallet
+            return render(request, 'pynny/edit_wallet.html', context=data)
+        elif action == 'edit_complete':
+            # Get the form data from the request
+            _name = request.POST['name']
+
+            # Edit the Wallet
+            wallet.name = _name
+            wallet.save()
+
+            data = {'alerts': {'success': ['<strong>Done!</strong> Wallet updated successfully!']}}
+            data['wallets'] = Wallet.objects.filter(user=request.user)
+            return render(request, 'pynny/wallets.html', context=data)
     elif request.method == 'GET':
         # Show the specific Wallet data
         data['wallet'] = wallet

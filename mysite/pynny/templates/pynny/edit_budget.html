@@ -1,0 +1,45 @@
+{% extends 'pynny/base.html' %}
+
+{% block title %}Edit Budget #{{ budget.id }} - Pynny{% endblock %}
+
+{% block content %}
+
+<form action="{% url 'one_budget' budget_id=budget.id %}" autocomplete="off" method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" name="action" value="edit_complete" />
+
+    <div class="input-group">
+        <label for="category">Budget Category: </label>
+        <select name="category" class="form-control">
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if budget.category.id == category.id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br />
+
+    <div class="input-group">
+        <label for="wallet">Wallet: </label>
+        <select name="wallet" class="form-control">
+            {% for wallet in wallets %}
+                <option value="{{ wallet.id }}" {% if budget.wallet.id == wallet.id %}selected {% endif %}>{{ wallet.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br />
+
+    <label for="goal">Goal: </label>
+    <div class="input-group">
+        <span class="input-group-addon">$</span>
+        <input type="number" class="form-control" step=0.01 value={{ budget.goal }} name="goal">
+    </div>
+
+    <br />
+
+    <button class="btn btn-md btn-primary" type="submit">Update Budget</button>
+</form>
+
+{% endblock %}

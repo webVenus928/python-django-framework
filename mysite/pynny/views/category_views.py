@@ -77,13 +77,36 @@ def one_category(request, category_id):
         return render(request, 'pynny/categories.html', context=data)
 
     if request.method == "POST":
-        # Delete the Category
-        category.delete()
+        # What kind of action?
+        action = request.POST['action'].lower()
 
-        # And return them to the categories page
-        data['categories'] = BudgetCategory.objects.filter(user=request.user)
-        data['alerts'] = {'info': ['<strong>Done!</strong> Your <em>' + category.name + '</em> Category was deleted successfully']}
-        return render(request, 'pynny/categories.html', context=data)
+        if action == 'delete':
+            # Delete the Category
+            category.delete()
+
+            # And return them to the categories page
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            data['alerts'] = {'info': ['<strong>Done!</strong> Your <em>' + category.name + '</em> Category was deleted successfully']}
+            return render(request, 'pynny/categories.html', context=data)
+        elif action == 'edit':
+            # Render the edit_category view
+            data['category'] = category
+            return render(request, 'pynny/edit_category.html', context=data)
+        elif action == 'edit_complete':
+            # Get the form data from the request
+            _name = request.POST['name']
+            _is_income = False
+            if 'is_income' in request.POST:
+                _is_income = True
+
+            # Edit the Category
+            category.name = _name
+            category.is_income = _is_income
+            category.save()
+
+            data = {'alerts': {'success': ['<strong>Done!</strong> Category updated successfully!']}}
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            return render(request, 'pynny/categories.html', context=data)
     elif request.method == 'GET':
         # Show the specific Category data
         data['category'] = category

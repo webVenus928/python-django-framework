@@ -6,11 +6,21 @@
 
 <br />
 
-<a href="{% url 'new_budget' %}">
-    <button class="btn btn-primary budget-create">
-        <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Budget
-    </button>
-</a>
+<div class="btn-group">
+    <a href="{% url 'new_budget' %}">
+        <button class="btn btn-primary budget-create">
+            <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Budget
+        </button>
+    </a>
+
+    <form method="POST" class="form-inline" action="{% url 'one_budget' budget_id=budget.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="edit" />
+        <button type="submit" class="btn btn-default budget-create">
+            <span class="glyphicon glyphicon-pencil"></span>&nbsp; Edit Budget
+        </button>
+    </form>
+</div>
 
 <div class="panel panel-{% budget_class budget %}">
     <div class="panel-heading">

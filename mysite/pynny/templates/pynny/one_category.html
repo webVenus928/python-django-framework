@@ -6,11 +6,21 @@
 
 <br />
 
-<a href="{% url 'new_category' %}">
-    <button class="btn btn-primary category-create">
-        <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Category
-    </button>
-</a>
+<div class="btn-group">
+    <a href="{% url 'new_category' %}">
+        <button class="btn btn-primary category-create">
+            <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Category
+        </button>
+    </a>
+
+    <form method="POST" class="form-inline" action="{% url 'one_category' category_id=category.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="edit" />
+        <button type="submit" class="btn btn-default category-create">
+            <span class="glyphicon glyphicon-pencil"></span>&nbsp; Edit Category
+        </button>
+    </form>
+</div>
 
 <h1 class="text-{% category_class category.is_income %}">{{ category.name }}</h1>
 

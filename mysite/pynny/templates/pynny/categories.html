@@ -20,6 +20,7 @@
             <tr>
                 <th>Name</th>
                 <th>Income?</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -31,6 +32,22 @@
                     {% else %}
                         <td></td>
                     {% endif %}
+                    <td>
+                        <form method="POST" class="form-inline" action="{% url 'one_category' category_id=category.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit" />
+                            <button type="submit" class="btn btn-sm btn-primary btn-inline">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                        </form>
+                        <form method="POST" class="form-inline" action="{% url 'one_category' category_id=category.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete" />
+                            <button type="submit" class="btn btn-sm btn-danger btn-inline">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -19,8 +19,19 @@
                 <a href="{% url 'one_budget' budget_id=budget.id %}">
                     <h3 style="display:inline" class="panel-title">{{ budget.category.name }} - {{ budget.wallet.name }}</h3>
                 </a>
+
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <form method="POST" class="form-inline" action="{% url 'one_budget' budget_id=budget.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit" />
+                    <button type="submit" class="btn btn-xs btn-primary btn-inline">
+                        <span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit
+                    </button>
+                </form>
+
                 <form action="{% url 'one_budget' budget_id=budget.id %}" method="POST">
                     {% csrf_token %}
+                    <input type="hidden" name="action" value="delete" />
                     <button class="btn btn-xs btn-danger pull-right budget-delete" type="submit">
                         <span class="glyphicon glyphicon-remove"></span>&nbsp;Delete
                     </button>
