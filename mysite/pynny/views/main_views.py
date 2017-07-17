@@ -49,7 +49,7 @@ def index(request):
         data['transactions_per_category_labels'].append(category.name)
         data['transactions_per_category_data'].append(len(Transaction.objects.filter(category=category)))
         data['transactions_per_category_colors'].append(colors[color_index])
-        color_index += 1
+        color_index = (color_index + 1) % len(colors)
 
     return render(request, 'pynny/dashboard.html', context=data)
 

@@ -21,7 +21,7 @@ def transactions(request):
 
     data = {}
     if request.method == 'GET':
-        data['transactions'] = Transaction.objects.filter(user=request.user)
+        data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         return render(request, 'pynny/transactions.html', context=data)
     # POST = create a new Transaction
     elif request.method == 'POST':
@@ -56,7 +56,7 @@ def transactions(request):
 
         # Render the transactions
         data = {'alerts': {'success': ['<strong>Done!</strong> New Transaction recorded successfully!']}}
-        data['transactions'] = Transaction.objects.filter(user=request.user)
+        data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         return render(request, 'pynny/transactions.html', context=data)
 
 
@@ -107,12 +107,12 @@ def one_transaction(request, transaction_id):
         transaction = Transaction.objects.get(id=transaction_id)
     except Transaction.DoesNotExist:
         # DNE
-        data['transactions'] = Transaction.objects.filter(user=request.user)
+        data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
         return render(request, 'pynny/transactions.html', context=data)
 
     if transaction.user != request.user:
-        data['transactions'] = Transaction.objects.filter(user=request.user)
+        data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
         return render(request, 'pynny/transactions.html', context=data)
 
@@ -139,7 +139,7 @@ def one_transaction(request, transaction_id):
             transaction.delete()
 
             # And return them to the Transactions page
-            data['transactions'] = Transaction.objects.filter(user=request.user)
+            data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
             data['alerts'] = {'info': ['<strong>Done!</strong> Transaction was deleted successfully']}
             return render(request, 'pynny/transactions.html', context=data)
         elif action == 'edit':
@@ -191,7 +191,7 @@ def one_transaction(request, transaction_id):
             transaction.save()
 
             data = {'alerts': {'success': ['<strong>Done!</strong> Transaction updated successfully!']}}
-            data['transactions'] = Transaction.objects.filter(user=request.user)
+            data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
             return render(request, 'pynny/transactions.html', context=data)
     elif request.method == 'GET':
         # Show the specific Transaction data

@@ -111,5 +111,5 @@ def one_category(request, category_id):
         # Show the specific Category data
         data['category'] = category
         data['budgets'] = Budget.objects.filter(category=category, month__contains=date.strftime(date.today(), '%Y-%m'))
-        data['transactions'] = Transaction.objects.filter(category=category)
+        data['transactions'] = Transaction.objects.filter(category=category).order_by('-created_time')
         return render(request, 'pynny/one_category.html', context=data)

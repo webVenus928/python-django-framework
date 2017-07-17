@@ -149,5 +149,5 @@ def one_budget(request, budget_id):
     elif request.method == 'GET':
         # Show the specific Budget data
         data['budget'] = budget
-        data['transactions'] = Transaction.objects.filter(category=budget.category)
+        data['transactions'] = Transaction.objects.filter(category=budget.category).order_by('-created_time')
         return render(request, 'pynny/one_budget.html', context=data)

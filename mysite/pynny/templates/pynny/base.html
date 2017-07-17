@@ -17,7 +17,7 @@
             {% if user.is_authenticated %}
                 <ul class="nav nav-tabs">
                     <li role="presentation" class="active"><a href="{% url 'index' %}"><strong>Pynny</strong></a></li>
-                    <li role="presentation"><a href="{% url 'profile' %}">Profile</a></li>
+                    <li role="presentation"><a href="{% url 'index' %}">Dashboard</a></li>
                     <li role="presentation"><a href="{% url 'wallets' %}">Wallets</a></li>
                     <li role="presentation"><a href="{% url 'budgets' %}">Budgets</a></li>
                     <li role="presentation"><a href="{% url 'categories' %}">Categories</a></li>

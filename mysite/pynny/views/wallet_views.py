@@ -107,5 +107,5 @@ def one_wallet(request, wallet_id):
         # Show the specific Wallet data
         data['wallet'] = wallet
         data['budgets'] = Budget.objects.filter(wallet=wallet, month__contains=date.strftime(date.today(), '%Y-%m'))
-        data['transactions'] = Transaction.objects.filter(wallet=wallet)
+        data['transactions'] = Transaction.objects.filter(wallet=wallet).order_by('-created_time')
         return render(request, 'pynny/one_wallet.html', context=data)
