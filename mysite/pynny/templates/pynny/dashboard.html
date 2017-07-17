@@ -15,6 +15,9 @@
   <div class="col-md-4">
     <canvas id="budgetsCanvas"></canvas>
   </div>
+  <div class="col-md-4">
+    <canvas id="transPerCategoryCanvas"></canvas>
+  </div>
 </div>
 
 
@@ -40,6 +43,7 @@ var budget_balance_data = [];
   budget_balance_data.push({{ data }});
 {% endfor %}
 
+// Draw the budgets overview doughnut chart
 var budgetChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
@@ -67,6 +71,52 @@ var budgetChart = new Chart(ctx, {
       animation: {
         animateScale: true,
         animateRotate: true
+      }
+    }
+});
+
+// Draw the chart for transactions per category
+var transactions_per_category_data = [];
+{% for data in transactions_per_category_data %}
+  transactions_per_category_data.push({{ data }});
+{% endfor %}
+
+var transactions_per_category_colors = [];
+{% for data in transactions_per_category_colors %}
+  transactions_per_category_colors.push("{{ data }}");
+{% endfor %}
+
+var transactions_per_category_labels = [];
+{% for data in transactions_per_category_labels %}
+  transactions_per_category_labels.push("{{ data }}");
+{% endfor %}
+var ctx = document.getElementById("transPerCategoryCanvas").getContext('2d');
+var budgetChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      datasets: [
+        {
+          backgroundColor: transactions_per_category_colors,
+          data: transactions_per_category_data
+        }
+      ],
+      labels: transactions_per_category_labels
+    },
+    options: {
+      responsive: true,
+      legend: {
+        display: false
+      },
+      title: {
+        display: true,
+        text: 'Transactions Per Category'
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            suggestedMax: 10
+          }
+        }],
       }
     }
 });

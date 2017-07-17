@@ -59,7 +59,7 @@ class Transaction(models.Model):
     `created_time` is a `datetime.datetime` instance
     and defaults to the current timestamp.'''
     amount = models.DecimalField(max_digits=20, decimal_places=2)
-    category = models.OneToOneField(BudgetCategory, on_delete=models.CASCADE)
+    category = models.ForeignKey(BudgetCategory, on_delete=models.CASCADE)
     description = models.CharField(max_length=150, blank=True, default='')
     created_time = models.DateField(blank=True, default=date.today)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)

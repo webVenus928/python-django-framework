@@ -25,13 +25,17 @@ def index(request):
     # show them their home page, displaying a dashboard
     data = {}
     budgets = Budget.objects.filter(user=request.user, month=date.today())
-    colors = ['#ff4444', '#ffbb33', '#00C851', '#33b5e5', '#aa66cc']
+    colors = ['#ff4444', '#ffbb33', '#00C851', '#33b5e5', '#aa66cc', '#a1887f']
     random.shuffle(colors)
     color_index = 0
     data['budget_categories'] = []
     data['budget_colors'] = []
     data['budget_goal_data'] = []
     data['budget_balance_data'] = []
+    data['transactions_per_category_data'] = []
+    data['transactions_per_category_colors'] = []
+    data['transactions_per_category_labels'] = []
+    data['current_month'] = date.today().strftime('%B, %Y')
 
     for budget in budgets:
         data['budget_categories'].append(budget.category.name)
@@ -39,6 +43,13 @@ def index(request):
         data['budget_balance_data'].append(budget.balance)
         data['budget_colors'].append(colors[color_index])
         color_index = (color_index + 1) % len(colors)
+
+    random.shuffle(colors)
+    for category in BudgetCategory.objects.filter(user=request.user):
+        data['transactions_per_category_labels'].append(category.name)
+        data['transactions_per_category_data'].append(len(Transaction.objects.filter(category=category)))
+        data['transactions_per_category_colors'].append(colors[color_index])
+        color_index += 1
 
     return render(request, 'pynny/dashboard.html', context=data)
 
