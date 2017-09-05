@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^transactions/$', transaction_views.transactions, name='transactions'), # /transactions/
     url(r'^transactions/(?P<transaction_id>[0-9]+)$', transaction_views.one_transaction, name='one_transaction'), # /transactions/9
     url(r'^transactions/create/$', transaction_views.new_transaction, name='new_transaction'), # /transactions/create
+    url(r'^budgets/renew/$', budget_views.renew_budgets, name='renew_budgets'),  # /budgets/renew
 ]

@@ -12,7 +12,7 @@ from django.contrib.auth import logout
 from datetime import date
 import random
 
-from ..models import Budget, Transaction, BudgetCategory, Wallet
+from ..models import Budget, Transaction, BudgetCategory
 
 
 def index(request):
@@ -24,7 +24,7 @@ def index(request):
     # User is logged in, so retrieve their data and
     # show them their home page, displaying a dashboard
     data = {}
-    budgets = Budget.objects.filter(user=request.user, month=date.today())
+    budgets = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
     colors = ['#ff4444', '#ffbb33', '#00C851', '#33b5e5', '#aa66cc', '#a1887f']
     random.shuffle(colors)
     color_index = 0

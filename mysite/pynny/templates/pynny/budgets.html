@@ -11,6 +11,11 @@
         <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;New Budget
     </button>
 </a>
+<a href="{% url 'renew_budgets' %}">
+    <button class="btn wallet-create">
+        <span class="glyphicon glyphicon-refresh"></span> Renew Last Month's Budgets
+    </button>
+</a>
 
 {% if budgets %}
     {% for budget in budgets %}
@@ -60,6 +65,10 @@
     <div class="alert alert-info">
         <strong>Heads up!</strong> You haven't created any Budgets yet. Get started 
         by clicking <a href="{% url 'new_budget' %}">New Budget</a>.
+    </div>
+    <div class="alert alert-info">
+        <strong>Missing Budgets?</strong> If you have Budgets from the previous month you'd like to renew for
+        the current one, click <a href="{% url 'renew_budgets' %}">Renew Budgets</a>.
     </div>
 {% endif %}
 
