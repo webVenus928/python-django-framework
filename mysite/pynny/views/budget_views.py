@@ -65,7 +65,10 @@ def budgets(request):
             return render(request, 'pynny/new_budget.html', context=data)
 
         # Create the new Budget
-        new_id = Budget.objects.latest('budget_id') + 1
+        latest_budget = Budget.objects.latest('budget_id')
+        new_id = 0
+        if latest_budget:
+            new_id = latest_budget.budget_id + 1
         Budget(category=category, wallet=wallet, goal=_goal, balance=_start_balance, user=request.user, budget_id=new_id).save()
         data = {'alerts': {'success': ['<strong>Done!</strong> New Budget created successfully!']}}
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
