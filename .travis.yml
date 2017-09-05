@@ -1,22 +1,18 @@
 language: python
 python:
-    - "3.4"
-    - "3.5"
-    - "3.6"
+  - "3.4"
+  - "3.5"
+  - "3.6"
 
-services:
-    - sqlite3
-
-env:
-    - DJANGO=1.11 DB=sqlite3
-
-# Install dependencies
 install: 
-    - pip install -q Django==$DJANGO
-
-before_script:
-    - python mysite/manage.py makemigrations
-    - python mysite/manage.py migrate
+  - pip install -r requirements.txt
 
 script:
-    - python mysite/manage.py test
+  - cd mysite
+  - python manage.py makemigrations
+  - python manage.py migrate
+  - coverage run --source=./ manage.py test
+  - coverage report -m
+
+after_script: coveralls
+
