@@ -4,22 +4,12 @@ python:
     - "3.5"
     - "3.6"
 
-dist: trusty
-sudo: required
-
-services:
-    - msyql
-
-env:
-    - DJANGO=1.11 DB=mysql
-
-# Install dependencies
 install: 
-    - pip install mysqlclient
-    - pip install -q Django==$DJANGO
-
-before_script:
-    - mysql -e 'SELECT database djangodb;'
+    - pip install -r requirements.txt
 
 script:
-    - python mysite/manage.py test
+    - coverage run --source=mysite/ mysite/manage.py test
+    - coverage report -m
+
+after_script: coveralls
+
