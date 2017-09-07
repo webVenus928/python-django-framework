@@ -11,7 +11,8 @@ script:
   - cd mysite
   - python manage.py makemigrations
   - python manage.py migrate
-  - coverage run --source=./ manage.py test
+  - cd ..
+  - coverage run --source=./mysite/ mysite/manage.py test pynny
   - coverage report -m
 
 after_script: coveralls
