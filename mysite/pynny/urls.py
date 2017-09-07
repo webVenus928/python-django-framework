@@ -17,7 +17,6 @@ urlpatterns = [
     url(r'^$', main_views.index, name='index'), # /
     url(r'^login/$', auth_views.login, name='login'), # /login/
     url(r'^logout/$', main_views.logout_view, name='logout'), # /logout/
-    url(r'^profile/$', main_views.profile, name='profile'), # /profile/
     url(r'^wallets/$', wallet_views.wallets, name='wallets'), # /wallets/
     url(r'^wallets/create/$', wallet_views.new_wallet, name='new_wallet'), # /wallets/create
     url(r'^wallets/(?P<wallet_id>[0-9]+)$', wallet_views.one_wallet, name='one_wallet',), # /wallets/3
