@@ -48,7 +48,6 @@ def budget_categories(request):
 @login_required(login_url='/pynny/login')
 def new_category(request):
     '''Create a new BudgetCategory form'''
-
     return render(request, 'pynny/new_category.html')
 
 
@@ -64,12 +63,12 @@ def one_category(request, category_id):
         # DNE
         data['categories'] = BudgetCategory.objects.filter(user=request.user)
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Category does not exist.']}
-        return render(request, 'pynny/categories.html', context=data)
+        return render(request, 'pynny/categories.html', context=data, status=404)
 
     if category.user != request.user:
         data['categories'] = BudgetCategory.objects.filter(user=request.user)
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Category does not exist.']}
-        return render(request, 'pynny/categories.html', context=data)
+        return render(request, 'pynny/categories.html', context=data, status=403)
 
     if request.method == "POST":
         # What kind of action?

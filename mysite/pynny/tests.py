@@ -68,6 +68,7 @@ class CategoryViewsTests(TestCase):
 
         self.budget = Budget.objects.create(budget_id=1, user_id=1, category_id=1, goal=100, month=datetime.date.today(), wallet_id=1, balance=0, user=self.user)
         self.budget.save()
+        self.login()
 
     def login(self):
         self.client.login(username='test_user', password='tester123')
@@ -80,7 +81,6 @@ class CategoryViewsTests(TestCase):
 
     def test_view_all_categories(self):
         """Test the GET to view all the budget categories"""
-        self.login()
         response = self.client.get(reverse('categories'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['categories']), 1)
@@ -97,7 +97,6 @@ class CategoryViewsTests(TestCase):
     def test_create_new_category(self):
         """Test the POST to create a new budget category"""
         category_name = 'travel'
-        self.login()
         resp = self.client.post(reverse('categories'), {'name': category_name})
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(len(resp.context['categories']), 2)
@@ -109,7 +108,6 @@ class CategoryViewsTests(TestCase):
         category.delete()
 
     def test_create_income_category(self):
-        self.login()
         name = 'paycheck'
         resp = self.client.post(reverse('categories'), {'name': name, 'is_income': True})
         self.assertEqual(resp.status_code, 201)
@@ -122,7 +120,6 @@ class CategoryViewsTests(TestCase):
         category.delete()
 
     def test_create_already_exists_category(self):
-        self.login()
         name = 'groceries'
         resp = self.client.post(reverse('categories'), {'name': 'groceries'})
         self.assertEqual(resp.status_code, 409)
@@ -130,3 +127,51 @@ class CategoryViewsTests(TestCase):
 
         categories = BudgetCategory.objects.filter(user=self.user, name=name)
         self.assertEqual(len(categories), 1)
+
+    def test_new_category(self):
+        resp = self.client.get(reverse('new_category'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_get_single_category(self):
+        resp = self.client.get('/pynny/categories/1')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context['category'], self.category)
+
+    def test_get_nonexistent_category(self):
+        resp = self.client.get('/pynny/categories/10000')
+        self.assertEqual(resp.status_code, 404)
+        self.assertTrue(len(resp.context['alerts']['errors']) >= 1)
+
+    def test_get_someone_elses_category(self):
+        new_user = User.objects.create_user(id=2, username='sally', password='sallyshells')
+        new_user.save()
+        new_category = BudgetCategory.objects.create(id=2, user_id=2, user=new_user, name='groceries', is_income=False)
+        new_category.save()
+        resp = self.client.get('/pynny/categories/2')
+        self.assertEqual(resp.status_code, 403)
+        self.assertTrue(len(resp.context['alerts']['errors']) >= 1)
+        new_category.delete()
+        new_user.delete()
+
+    def test_delete_a_category(self):
+        resp = self.client.post('/pynny/categories/1', {'action': 'delete'})
+        self.assertEqual(resp.status_code, 200)
+        categories = BudgetCategory.objects.filter(user=self.user)
+        self.assertEqual(len(categories), 0)
+        self.assertTrue(len(resp.context['alerts']['info']) >= 1)
+
+    def test_view_edit_category_page(self):
+        resp = self.client.post('/pynny/categories/1', {'action': 'edit'})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context['category'], self.category)
+
+    def test_view_edit_category_completion(self):
+        resp = self.client.post('/pynny/categories/1', {'action': 'edit_complete', 'name': 'gifts', 'is_income': True})
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(len(resp.context['categories']) >= 1)
+        self.assertTrue(len(resp.context['alerts']['success']) >= 1)
+        category = BudgetCategory.objects.get(id=1)
+        self.assertEqual(category, self.category)
+        self.assertEqual(category.name, 'gifts')
+        self.assertEqual(category.is_income, True)
+
