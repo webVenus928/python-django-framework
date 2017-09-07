@@ -6,6 +6,7 @@ python:
 
 install: 
   - pip install -r requirements.txt
+  - pip install codecov
 
 script:
   - cd mysite
@@ -15,5 +16,5 @@ script:
   - coverage run --source=./mysite/ mysite/manage.py test pynny
   - coverage report -m
 
-after_script: coveralls
+after_script: codecov
 
