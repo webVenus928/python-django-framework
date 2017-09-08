@@ -175,3 +175,4 @@ class CategoryViewsTests(TestCase):
         self.assertEqual(category.name, 'gifts')
         self.assertEqual(category.is_income, True)
 
+
