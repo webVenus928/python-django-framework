@@ -5,7 +5,7 @@ from django.utils import timezone
 
 import datetime
 
-from .models import Budget, BudgetCategory, Wallet
+from .models import Budget, BudgetCategory, Wallet, Transaction
 
 
 class SimpleTest(TestCase):
@@ -176,3 +176,59 @@ class CategoryViewsTests(TestCase):
         self.assertEqual(category.is_income, True)
 
 
+class TransactionViewsTests(TestCase):
+    def setUp(self):
+        # Create a user and give them some data to test with
+        self.user = User.objects.create_user(id=1, username='test_user', email='test_user@gmail.com', password='tester123')
+        self.user.save()
+
+        self.category = BudgetCategory.objects.create(id=1, user_id=1, user=self.user, name='groceries', is_income=False)
+        self.category.save()
+
+        self.wallet = Wallet.objects.create(id=1, user_id=1, name='checking', balance='100', created_time=timezone.now())
+        self.wallet.save()
+
+        self.transaction = Transaction.objects.create(id=1, amount=10.50, category=self.category, category_id=1,
+                                                      description='foo', created_time=timezone.now(),
+                                                      wallet=self.wallet, wallet_id=1, user=self.user, user_id=1)
+        self.transaction.save()
+
+        self.budget = Budget.objects.create(budget_id=1, user_id=1, category_id=1, goal=100, month=datetime.date.today(), wallet_id=1, balance=0, user=self.user)
+        self.budget.save()
+        self.login()
+
+    def login(self):
+        self.client.login(username='test_user', password='tester123')
+
+    def tearDown(self):
+        self.budget.delete()
+        self.wallet.delete()
+        self.category.delete()
+        self.user.delete()
+
+    def test_get_all_transaction(self):
+        resp = self.client.get(reverse('transactions'))
+        self.assertEqual(resp.status_code, 200)
+        transactions = resp.context['transactions']
+        self.assertTrue(len(transactions) >= 1)
+        self.assertEqual(transactions[0].user, self.user)
+        self.assertEqual(transactions[0], self.transaction)
+
+    def test_create_new_transaction(self):
+        resp = self.client.post(
+            reverse('transactions'),
+            {
+                'category': 1,
+                'wallet': 1,
+                'amount': 50.75,
+                'description': 'bar',
+                'created_time': '2017-09-07'
+            }
+        )
+        self.assertEqual(resp.status_code, 201)
+        new_balance = Wallet.objects.get(id=1).balance
+        self.assertEqual(new_balance, 100 - 50.75)
+        transactions = Transaction.objects.filter(user=self.user)
+        self.assertTrue(len(transactions) >= 2)
+        transactions = Transaction.objects.filter(user=self.user, category=self.category)
+        self.assertTrue(len(transactions) >= 2)
