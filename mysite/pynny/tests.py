@@ -181,6 +181,9 @@ class TransactionViewsTests(TestCase):
         # Create a user and give them some data to test with
         self.user = User.objects.create_user(id=1, username='test_user', email='test_user@gmail.com', password='tester123')
         self.user.save()
+        self.other_user = User.objects.create_user(id=2, username='test_user2', email='test_user2@gmail.com',
+                                             password='123tester')
+        self.other_user.save()
 
         self.category = BudgetCategory.objects.create(id=1, user_id=1, user=self.user, name='groceries', is_income=False)
         self.category.save()
@@ -232,3 +235,52 @@ class TransactionViewsTests(TestCase):
         self.assertTrue(len(transactions) >= 2)
         transactions = Transaction.objects.filter(user=self.user, category=self.category)
         self.assertTrue(len(transactions) >= 2)
+
+    def test_create_transaction_of_income(self):
+        category = BudgetCategory.objects.create(id=2, user_id=1, user=self.user, name='paycheck',
+                                                      is_income=True)
+        category.save()
+        resp = self.client.post(
+            reverse('transactions'),
+            {
+                'category': 2,
+                'wallet': 1,
+                'amount': 50.75,
+                'description': 'bar',
+                'created_time': '2017-09-07'
+            }
+        )
+        self.assertEqual(resp.status_code, 201)
+        new_balance = Wallet.objects.get(id=1).balance
+        self.assertEqual(new_balance, 100 + 50.75)
+        transactions = Transaction.objects.filter(user=self.user)
+        self.assertTrue(len(transactions) >= 2)
+        transactions = Transaction.objects.filter(user=self.user, category=category)
+        self.assertTrue(len(transactions) == 1)
+
+    def test_new_transaction_page(self):
+        resp = self.client.get(reverse('new_transaction'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('categories' in resp.context)
+        self.assertTrue(len(resp.context['categories']) == 1)
+        self.assertTrue('wallets' in resp.context)
+        self.assertEqual(len(resp.context['wallets']), 1)
+
+    def test_new_transaction_with_no_categories(self):
+        self.client.logout()
+        self.client.login(username='test_user2', password='123tester')
+        resp = self.client.get(reverse('new_transaction'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(len(resp.context['alerts']['errors']) >= 1)
+        self.assertTrue('don\'t have any Categories yet' in resp.context['alerts']['errors'][0])
+
+    def test_new_transaction_with_no_wallet(self):
+        self.client.logout()
+        category = BudgetCategory.objects.create(id=2, user_id=2, user=self.other_user, name='paycheck',
+                                                 is_income=True)
+        category.save()
+        self.client.login(username='test_user2', password='123tester')
+        resp = self.client.get(reverse('new_transaction'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(len(resp.context['alerts']['errors']) >= 1)
+        self.assertTrue('don\'t have any Wallets yet' in resp.context['alerts']['errors'][0])
