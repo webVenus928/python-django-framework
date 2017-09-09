@@ -103,12 +103,12 @@ def one_transaction(request, transaction_id):
         # DNE
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
-        return render(request, 'pynny/transactions.html', context=data)
+        return render(request, 'pynny/transactions.html', context=data, status=404)
 
     if transaction.user != request.user:
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
-        return render(request, 'pynny/transactions.html', context=data)
+        return render(request, 'pynny/transactions.html', context=data, status=403)
 
     if request.method == "POST":
         # What kind of POST was this?
@@ -154,9 +154,9 @@ def one_transaction(request, transaction_id):
             new_category = BudgetCategory.objects.get(id=_category)
 
             # Undo the last version of the transaction
-            print('balance before undo: ' + str(transaction.wallet.balance))
+            # print('balance before undo: ' + str(transaction.wallet.balance))
             undo_transaction(transaction)
-            print('balance after undo: ' + str(transaction.wallet.balance))
+            # print('balance after undo: ' + str(transaction.wallet.balance))
 
             # Now carry out the effects of the revised transaction
             # Update the balance of appropriate budgets
@@ -168,13 +168,13 @@ def one_transaction(request, transaction_id):
 
             # Update the wallet balance
             new_wallet = Wallet.objects.get(id=_wallet)
-            print('balance before update: ' + str(new_wallet.balance))
+            # print('balance before update: ' + str(new_wallet.balance))
             if new_category.is_income:
                 new_wallet.balance += decimal.Decimal(_amount)
             else:
                 new_wallet.balance -= decimal.Decimal(_amount)
             new_wallet.save()
-            print('balance after update: ' + str(new_wallet.balance))
+            # print('balance after update: ' + str(new_wallet.balance))
 
             # And update the transaction itself
             transaction.category = new_category
