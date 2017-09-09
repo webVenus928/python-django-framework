@@ -8,16 +8,14 @@ Implements views/handlers for Wallet-related requests
 
 from django.shortcuts import render, reverse, redirect
 from datetime import date
+from django.contrib.auth.decorators import login_required
 
 from ..models import Wallet, Budget, Transaction
 
+
+@login_required(login_url='/pynny/login')
 def wallets(request):
     '''Display Wallets for a user'''
-    # Is user logged in?
-    if not request.user.is_authenticated():
-        # Not authenticated; send to login
-        return redirect(reverse('login'))
-
     # GET = display user's wallets
     if request.method == 'GET':
         data = {}
@@ -42,24 +40,18 @@ def wallets(request):
         Wallet(name=name, balance=start_balance, user=request.user).save()
         data = {'alerts': {'success': ['<strong>Done!</strong> New wallet created successfully!']}}
         data['wallets'] = Wallet.objects.filter(user=request.user)
-        return render(request, 'pynny/wallets.html', context=data)
+        return render(request, 'pynny/wallets.html', context=data, status=201)
 
 
-
+@login_required(login_url='/pynny/login')
 def new_wallet(request):
     '''Display form for creating a new wallet'''
-    # Is user logged in?
-    if not request.user.is_authenticated():
-        return redirect(reverse('login'))
-
     return render(request, 'pynny/new_wallet.html')
 
 
+@login_required(login_url='/pynny/login')
 def one_wallet(request, wallet_id):
     '''Handles requests to a specific wallet'''
-    if not request.user.is_authenticated:
-        return redirect(reverse('login'))
-
     data = {}
 
     # Check if the wallet is owned by the logged in user
@@ -69,12 +61,12 @@ def one_wallet(request, wallet_id):
         # DNE
         data['wallets'] = Wallet.objects.filter(user=request.user)
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That wallet does not exist.']}
-        return render(request, 'pynny/wallets.html', context=data)
+        return render(request, 'pynny/wallets.html', context=data, status=404)
 
     if wallet.user != request.user:
         data['wallets'] = Wallet.objects.filter(user=request.user)
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That wallet does not exist.']}
-        return render(request, 'pynny/wallets.html', context=data)
+        return render(request, 'pynny/wallets.html', context=data, status=403)
 
     if request.method == 'POST':
         # What action?
