@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from django.conf import global_settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,6 +33,7 @@ ALLOWED_HOSTS = ['*',]
 
 INSTALLED_APPS = [
     'pynny.apps.PynnyConfig',
+    'bootstrap_admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -67,6 +69,8 @@ TEMPLATES = [
         },
     },
 ]
+
+BOOTSTRAP_ADMIN_SIDEBAR_MENU = True
 
 LOGIN_REDIRECT_URL = '/pynny/'
 

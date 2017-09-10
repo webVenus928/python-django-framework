@@ -10,7 +10,8 @@ from django.shortcuts import render, reverse, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import  login_required
 
-from datetime import date
+from datetime import date, datetime
+from django.utils import timezone
 import random
 
 from ..models import Budget, Transaction, BudgetCategory
@@ -26,6 +27,9 @@ def index(request):
     colors = ['#ff4444', '#ffbb33', '#00C851', '#33b5e5', '#aa66cc', '#a1887f']
     random.shuffle(colors)
     color_index = 0
+    data['budgets'] = budgets
+    data['categories'] = BudgetCategory.objects.filter(user=request.user)
+    data['transactions'] = Transaction.objects.filter(user=request.user, created_time__year=timezone.now().year, created_time__month=timezone.now().month)
     data['budget_categories'] = []
     data['budget_colors'] = []
     data['budget_goal_data'] = []

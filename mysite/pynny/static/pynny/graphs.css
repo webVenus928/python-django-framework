@@ -1,0 +1,12 @@
+#budgetAllocationChart svg {
+    text.middle {
+        font-weight: 300;
+        font-size: 24px;
+    }
+
+  .nvd3.nv-pie .nv-pieLabels text {
+    font-size: 18px;
+    font-weight: 300;
+    fill: #fff !important;
+  }
+}

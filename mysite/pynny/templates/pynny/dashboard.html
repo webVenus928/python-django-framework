@@ -4,6 +4,8 @@
 
 {% block content %}
 
+{% load staticfiles %}
+
 <div class="page-header">
   <div class="well">
     <h1>Your Dashboard</h1>
@@ -13,115 +15,187 @@
 </div>
 
 <div class="row">
-  <div class="col-md-4">
-    <canvas id="budgetsCanvas"></canvas>
+  <div class="col-lg-6">
+    <h3 class="center-text">Budget Allocations</h3>
+    <div id="budgetAllocationChart">
+      <svg width="1000" height="1000"></svg>
+    </div>
   </div>
-  <div class="col-md-4">
-    <canvas id="transPerCategoryCanvas" height=300></canvas>
+
+  <div class="col-lg-6">
+    <h3 class="center-text">Budget Status</h3>
+    <div id="budgetStatusesChart">
+      <svg width="1000" height="1000"></svg>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-4">
+    <h3 class="center-text">Transactions Per Category</h3>
+    <div id="transactionsPerCategoryChart">
+      <svg width="1000" height="1000"></svg>
+    </div>
   </div>
 </div>
 
 
 <script>
-var ctx = document.getElementById("budgetsCanvas").getContext('2d');
-var budget_colors = [];
-{% for col in budget_colors %}
-  budget_colors.push("{{ col }}");
-{% endfor %}
-
-var categories = [];
-{% for cat in budget_categories %}
-  categories.push("{{ cat }}");
-{% endfor %}
-
-var budget_goal_data = [];
-{% for data in budget_goal_data %}
-  budget_goal_data.push({{ data }});
-{% endfor %}
-
-var budget_balance_data = [];
-{% for data in budget_balance_data %}
-  budget_balance_data.push({{ data }});
-{% endfor %}
-
-// Draw the budgets overview doughnut chart
-var budgetChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      datasets: [{
-        data: budget_goal_data,
-        backgroundColor: budget_colors,
-        label: 'Budget Goals'
-      },
-      {
-        data: budget_balance_data,
-        backgroundColor: budget_colors,
-        label: 'Budget Balances'
-      }],
-      labels: categories,
-    },
-    options: {
-      responsive: true,
-      legend: {
-        positition: 'bottom',
-      },
-      title: {
-        display: true,
-        text: 'Budgets Overview'
-      },
-      animation: {
-        animateScale: true,
-        animateRotate: true
-      }
-    }
+var budgetAllocations = [];
+var budgetStatusTickValues = [];
+var budgetStatusData = [{key: "Goal", values: [], color: randomColor()}, {key: "Balance", values: [], color: randomColor()}];
+var budgetAllocationColors = randomColor({
+  count: {{ budgets|length }}
 });
 
-// Draw the chart for transactions per category
-var transactions_per_category_data = [];
-{% for data in transactions_per_category_data %}
-  transactions_per_category_data.push({{ data }});
-{% endfor %}
+var maxBudgetGoal = 0;
+var maxBudgetBalance = 0;
 
-var transactions_per_category_colors = [];
-{% for data in transactions_per_category_colors %}
-  transactions_per_category_colors.push("{{ data }}");
-{% endfor %}
-
-var transactions_per_category_labels = [];
-{% for data in transactions_per_category_labels %}
-  transactions_per_category_labels.push("{{ data }}");
-{% endfor %}
-var ctx = document.getElementById("transPerCategoryCanvas").getContext('2d');
-var budgetChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      datasets: [
-        {
-          backgroundColor: transactions_per_category_colors,
-          data: transactions_per_category_data
-        }
-      ],
-      labels: transactions_per_category_labels
-    },
-    options: {
-      responsive: true,
-      legend: {
-        display: false
-      },
-      title: {
-        display: true,
-        text: 'Transactions Per Category'
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            suggestedMax: 10
-          }
-        }],
-      }
+{% for budget in budgets %}
+  budgetAllocations.push({"label": "{{ budget.category.name }} - {{ budget.wallet.name }}", "value": {{ budget.goal }}});
+  budgetStatusData[0].values.push(
+    {
+      x: "{{ budget.category.name }} ({{ budget.wallet.name }})",
+      y: {{ budget.goal }}
     }
+  );
+  budgetStatusData[1].values.push(
+    {
+      x: "{{ budget.category.name }} ({{ budget.wallet.name }})",
+      y: {{ budget.balance }}
+    }
+  );
+  if ({{ budget.balance }} > maxBudgetBalance)
+    maxBudgetBalance = {{ budget.balance }};
+  if ({{ budget.goal }} > maxBudgetGoal)
+    maxBudgetGoal = {{ budget.goal }};
+{% endfor %}
+
+var budgetStatusTickSteps = Math.ceil((maxBudgetBalance + maxBudgetGoal) / 200) * 200;
+budgetStatusTickSteps = budgetStatusTickSteps / 8;
+for (var i = 1; i < 8; i++) {
+  budgetStatusTickValues.push(i * budgetStatusTickSteps);
+}
+
+
+
+var transactionsPerCategoryData = [{key: "Category", values: [], color: randomColor()}];
+var transactionsPerCategoryTicks = [];
+var maxQuantity = 0; var totalQuantity = 0;
+{% for category in categories %}
+  var numTrans = 0;
+  {% for transaction in transactions %}
+    if ("{{ transaction.category.name }}" === "{{ category.name }}")
+      numTrans += 1;
+  {% endfor %}
+  transactionsPerCategoryData[0].values.push(
+    {
+      x: "{{ category.name }}",
+      y: numTrans
+    }
+  );
+  if (numTrans > maxQuantity)
+    maxQuantity = numTrans;
+  totalQuantity += numTrans;
+{% endfor %}
+
+var avgQuantity = totalQuantity / {{ categories|length }};
+for (var i = 0; i < maxQuantity+2; i++) {
+  transactionsPerCategoryTicks.push(i);
+}
+
+
+
+
+// Budgets allocation donut chart
+nv.addGraph(function() {
+  var budgetAllocationsChart = nv.models.pieChart()
+      .x(function(d) { return d.label })
+      .y(function(d) { return d.value })
+      .showLabels(true)     //Display pie labels
+      .labelThreshold(.05)  //Configure the minimum slice size for labels to show up
+      .labelType("percent") //Configure what type of data to show in the label. Can be "key", "value" or "percent"
+      .donut(true)          //Turn on Donut mode. Makes pie chart look tasty!
+      .donutRatio(0.35)     //Configure how big you want the donut hole size to be.
+      .color(budgetAllocationColors)
+      .duration(500)
+      ;
+
+  d3.select("#budgetAllocationChart svg")
+      .datum(budgetAllocations)
+      .transition().duration(50)
+      .call(budgetAllocationsChart);
+
+  nv.utils.windowResize(budgetAllocationsChart.update);
+
+  return budgetAllocationsChart;
+});
+
+
+// Budgets Statuses grouped bar chart
+nv.addGraph(function() {
+  var budgetStatusesChart = nv.models.multiBarChart()
+    .duration(300)
+    .groupSpacing(0.25)
+    .margin({bottom: 100, top: 40})
+    .wrapLabels(true)
+  ;
+
+  budgetStatusesChart.xAxis
+    .axisLabel("Budget")
+    .axisLabelDistance(15)
+    .showMaxMin(false)
+  ;
+
+  budgetStatusesChart.yAxis
+    .axisLabel("Goal / Balance")
+    .axisLabelDistance(-5)
+    .showMaxMin(false)
+    .tickValues(budgetStatusTickValues)
+  ;
+
+  d3.select('#budgetStatusesChart svg')
+    .datum(budgetStatusData)
+    .call(budgetStatusesChart);
+
+  nv.utils.windowResize(budgetStatusesChart.update);
+
+  return budgetStatusesChart;
+});
+
+
+nv.addGraph(function() {
+  var transPerCategoryChart = nv.models.discreteBarChart()
+    .duration(300)
+    .margin({bottom: 100, top: 40})
+    .wrapLabels(true)
+  ;
+
+  transPerCategoryChart.xAxis
+    .axisLabel("Category")
+    .axisLabelDistance(15)
+    .showMaxMin(false)
+  ;
+
+  transPerCategoryChart.yAxis
+    .axisLabel("Transactions")
+    .axisLabelDistance(-5)
+    .showMaxMin(false)
+    .tickValues(transactionsPerCategoryTicks)
+  ;
+
+  d3.select('#transactionsPerCategoryChart svg')
+    .datum(transactionsPerCategoryData)
+    .call(transPerCategoryChart);
+
+  nv.utils.windowResize(transPerCategoryChart.update);
+  return transPerCategoryChart;
 });
 </script>
 
-
+<style>
+body {
+  padding-bottom: 50px;
+}
+</style>
 {% endblock %}
