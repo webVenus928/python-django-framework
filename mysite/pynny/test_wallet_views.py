@@ -41,8 +41,10 @@ class WalletViewsTests(TestCase):
     def tearDown(self):
         self.budget.delete()
         self.wallet.delete()
+        self.other_wallet.delete()
         self.category.delete()
         self.user.delete()
+        self.other_user.delete()
 
     def test_get_all_wallets(self):
         resp = self.client.get(reverse('wallets'))

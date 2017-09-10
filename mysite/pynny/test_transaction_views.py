@@ -41,6 +41,7 @@ class TransactionViewsTests(TestCase):
         self.wallet.delete()
         self.category.delete()
         self.user.delete()
+        self.other_user.delete()
 
     def test_get_all_transaction(self):
         resp = self.client.get(reverse('transactions'))
