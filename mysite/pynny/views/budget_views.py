@@ -7,12 +7,14 @@ Implements the views/handlers for Budget-related requests
 '''
 
 from django.shortcuts import render, redirect, reverse
+from django.contrib.auth.decorators import login_required
 import decimal
 from datetime import date
 
 from ..models import Budget, BudgetCategory, Wallet, Transaction
 
 
+@login_required(login_url='/pynny/login')
 def renew_budgets(request):
     if request.user.is_authenticated():
         all_budgets = Budget.objects.filter(user=request.user)
@@ -29,13 +31,9 @@ def renew_budgets(request):
     return budgets(request)
 
 
+@login_required(login_url='/pynny/login')
 def budgets(request):
     '''Display Budgets for a user'''
-    # Is user logged in?
-    if not request.user.is_authenticated():
-        # Not authenticated; send to login
-        return redirect(reverse('login'))
-
     # GET = display user's budgets
     if request.method == 'GET':
         data = {}
@@ -72,14 +70,12 @@ def budgets(request):
         Budget(category=category, wallet=wallet, goal=_goal, balance=_start_balance, user=request.user, budget_id=new_id).save()
         data = {'alerts': {'success': ['<strong>Done!</strong> New Budget created successfully!']}}
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
-        return render(request, 'pynny/budgets.html', context=data)
+        return render(request, 'pynny/budgets.html', context=data, status=201)
 
+
+@login_required(login_url='/pynny/login')
 def new_budget(request):
     '''Create a new Budget form'''
-    # Is user logged in?
-    if not request.user.is_authenticated():
-        return redirect(reverse('login'))
-
     # Get the categories
     data = {}
     data['categories'] = BudgetCategory.objects.filter(user=request.user)
@@ -110,11 +106,9 @@ def new_budget(request):
     return render(request, 'pynny/new_budget.html', context=data)
 
 
+@login_required(login_url='/pynny/login')
 def one_budget(request, budget_id):
     '''View a specific Budget'''
-    if not request.user.is_authenticated:
-        return redirect(reverse('login'))
-
     data = {}
 
     # Check if the budget is owned by the logged in user
@@ -124,12 +118,12 @@ def one_budget(request, budget_id):
         # DNE
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Budget does not exist.']}
-        return render(request, 'pynny/budgets.html', context=data)
+        return render(request, 'pynny/budgets.html', context=data, status=404)
 
     if budget.user != request.user:
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Budget isn\'t yours! You don\'t have permission to view it']}
-        return render(request, 'pynny/budgets.html', context=data)
+        return render(request, 'pynny/budgets.html', context=data, status=403)
 
     if request.method == "POST":
         # What kind of action?
@@ -141,7 +135,7 @@ def one_budget(request, budget_id):
 
             # And return them to the budgets page
             data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
-            data['alerts'] = {'info': ['<strong>Done!</strong> Budget was deleted successfully']}
+            data['alerts'] = {'success': ['<strong>Done!</strong> Budget was deleted successfully']}
             return render(request, 'pynny/budgets.html', context=data)
         elif action == 'edit':
             # Render the edit_budget view
