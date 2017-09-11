@@ -7,17 +7,15 @@ Implements the views/handlers for BudgetCategory-related requests
 '''
 
 from django.shortcuts import redirect, render, reverse
+from django.contrib.auth.decorators import login_required
 from datetime import date
 
 from ..models import BudgetCategory, Budget, Transaction
 
 
+@login_required(login_url='/pynny/login')
 def budget_categories(request):
-    '''View BudgetCategories for a user'''
-    # Is user logged in?
-    if not request.user.is_authenticated():
-        # Not authenticated; send to login
-        return redirect(reverse('login'))
+    """View BudgetCategories for a user"""
 
     # GET = display user's categories
     if request.method == 'GET':
@@ -38,28 +36,24 @@ def budget_categories(request):
         # Check if the category name exists already
         if BudgetCategory.objects.filter(user=request.user, name=name):
             data = {'alerts': {'errors': ['<strong>Oops!</strong> A category already exists with that name']}}
-            return render(request, 'pynny/new_category.html', context=data)
+            return render(request, 'pynny/new_category.html', context=data, status=409)
 
-        # Create the new Wallet
+        # Create the new BudgetCategory
         BudgetCategory(name=name, is_income=is_income, user=request.user).save()
         data = {'alerts': {'success': ['<strong>Done!</strong> New Category created successfully!']}}
         data['categories'] = BudgetCategory.objects.filter(user=request.user)
-        return render(request, 'pynny/categories.html', context=data)
+        return render(request, 'pynny/categories.html', context=data, status=201)
 
+
+@login_required(login_url='/pynny/login')
 def new_category(request):
     '''Create a new BudgetCategory form'''
-    # Is user logged in?
-    if not request.user.is_authenticated():
-        return redirect(reverse('login'))
-
     return render(request, 'pynny/new_category.html')
 
 
+@login_required(login_url='/pynny/login')
 def one_category(request, category_id):
     '''View a specific BudgetCategory'''
-    if not request.user.is_authenticated:
-        return redirect(reverse('login'))
-
     data = {}
 
     # Check if the category is owned by the logged in user
@@ -69,12 +63,12 @@ def one_category(request, category_id):
         # DNE
         data['categories'] = BudgetCategory.objects.filter(user=request.user)
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Category does not exist.']}
-        return render(request, 'pynny/categories.html', context=data)
+        return render(request, 'pynny/categories.html', context=data, status=404)
 
     if category.user != request.user:
         data['categories'] = BudgetCategory.objects.filter(user=request.user)
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Category does not exist.']}
-        return render(request, 'pynny/categories.html', context=data)
+        return render(request, 'pynny/categories.html', context=data, status=403)
 
     if request.method == "POST":
         # What kind of action?

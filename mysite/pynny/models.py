@@ -79,6 +79,7 @@ class Budget(models.Model):
     `month` is a `datetime.date` instance indicating what
     month the Budget applies to. `wallet` refers to the
     Wallet this Budget applies to.'''
+    budget_id = models.PositiveIntegerField()
     category = models.ForeignKey(BudgetCategory, on_delete=models.CASCADE)
     goal = models.DecimalField(max_digits=20, decimal_places=2)
     month = models.DateField(default=date.today, blank=True)

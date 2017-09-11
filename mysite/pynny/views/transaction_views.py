@@ -8,17 +8,15 @@ Implements the views/handlers for Transaction-related requetss
 
 from datetime import date, datetime
 from django.shortcuts import render, redirect, reverse
+from django.contrib.auth.decorators import login_required
 import decimal
 
 from ..models import Transaction, BudgetCategory, Wallet, Budget
 
+
+@login_required(login_url='/pynny/login')
 def transactions(request):
     '''View transactions for a user'''
-    # Is user logged in?
-    if not request.user.is_authenticated():
-        # Not authenticated; send to login
-        return redirect(reverse('login'))
-
     data = {}
     if request.method == 'GET':
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
@@ -57,15 +55,12 @@ def transactions(request):
         # Render the transactions
         data = {'alerts': {'success': ['<strong>Done!</strong> New Transaction recorded successfully!']}}
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
-        return render(request, 'pynny/transactions.html', context=data)
+        return render(request, 'pynny/transactions.html', context=data, status=201)
 
 
-
+@login_required(login_url='/pynny/login')
 def new_transaction(request):
     '''View for creating a new transaction'''
-    if not request.user.is_authenticated():
-        return redirect(reverse('login'))
-
     data = {}
     data['categories'] = BudgetCategory.objects.filter(user=request.user)
     data['wallets'] = Wallet.objects.filter(user=request.user)
@@ -95,11 +90,10 @@ def new_transaction(request):
     data['default_date'] = date.strftime(date.today(), '%Y-%m-%d')
     return render(request, 'pynny/new_transaction.html', context=data)
 
+
+@login_required(login_url='/pynny/login')
 def one_transaction(request, transaction_id):
     '''View for a single Transaction'''
-    if not request.user.is_authenticated():
-        return redirect(reverse('login'))
-
     data = {}
 
     # Check if transaction is owned by user
@@ -109,12 +103,12 @@ def one_transaction(request, transaction_id):
         # DNE
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
-        return render(request, 'pynny/transactions.html', context=data)
+        return render(request, 'pynny/transactions.html', context=data, status=404)
 
     if transaction.user != request.user:
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
-        return render(request, 'pynny/transactions.html', context=data)
+        return render(request, 'pynny/transactions.html', context=data, status=403)
 
     if request.method == "POST":
         # What kind of POST was this?
@@ -160,9 +154,9 @@ def one_transaction(request, transaction_id):
             new_category = BudgetCategory.objects.get(id=_category)
 
             # Undo the last version of the transaction
-            print('balance before undo: ' + str(transaction.wallet.balance))
+            # print('balance before undo: ' + str(transaction.wallet.balance))
             undo_transaction(transaction)
-            print('balance after undo: ' + str(transaction.wallet.balance))
+            # print('balance after undo: ' + str(transaction.wallet.balance))
 
             # Now carry out the effects of the revised transaction
             # Update the balance of appropriate budgets
@@ -174,13 +168,13 @@ def one_transaction(request, transaction_id):
 
             # Update the wallet balance
             new_wallet = Wallet.objects.get(id=_wallet)
-            print('balance before update: ' + str(new_wallet.balance))
+            # print('balance before update: ' + str(new_wallet.balance))
             if new_category.is_income:
                 new_wallet.balance += decimal.Decimal(_amount)
             else:
                 new_wallet.balance -= decimal.Decimal(_amount)
             new_wallet.save()
-            print('balance after update: ' + str(new_wallet.balance))
+            # print('balance after update: ' + str(new_wallet.balance))
 
             # And update the transaction itself
             transaction.category = new_category
@@ -197,6 +191,7 @@ def one_transaction(request, transaction_id):
         # Show the specific Transaction data
         data['transaction'] = transaction
         return render(request, 'pynny/one_transaction.html', context=data)
+
 
 def undo_transaction(trans):
     '''Reverts the effects of a Transaction on budgets and its wallet'''

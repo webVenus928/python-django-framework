@@ -26,3 +26,7 @@
 .form-inline {
     display: inline;
 }
+
+.center-text {
+    text-align: center;
+}
