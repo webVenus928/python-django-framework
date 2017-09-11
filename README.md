@@ -3,3 +3,5 @@
 # Pynny
 An open-source budgeting web app created with Python using the Django framework.
 
+To run in dev environment, use `python manage.py runserver --settings=mysite.mysite.settings.dev`
+
