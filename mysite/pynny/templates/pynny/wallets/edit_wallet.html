@@ -4,17 +4,17 @@
 
 {% block content %}
 
-<form action="{% url 'one_wallet' wallet_id=wallet.id %}" autocomplete="off" method="POST">
+<form class="form-edit" action="{% url 'one_wallet' wallet_id=wallet.id %}" autocomplete="off" method="POST">
     {% csrf_token %}
 
     <input type="hidden" name="action" value="edit_complete" />
 
-    <div class="input-group">
-        <label for="name">Wallet Name: </label>
-        <input type="text" class="form-control" name="name" placeholder="My Credit Card" value="{{ wallet.name }}">
+    <div class="form-group">
+        <label for="editWalletName">Wallet Name: </label>
+        <div class="input-group">
+            <input id="editWalletName" type="text" class="form-control" name="name" placeholder="My Credit Card" value="{{ wallet.name }}">
+        </div>
     </div>
-
-    <br />
 
     <button class="btn btn-md btn-primary" type="submit">Update Wallet</button>
 </form>

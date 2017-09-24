@@ -4,44 +4,127 @@
 
 {% block content %}
 
-<br />
+<div class="modal fade" id="createWalletModal" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Wallet</h5>
+                    <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                        <form class="form-horizontal" action="{% url 'wallets' %}" autocomplete="off" method="POST">
+                            {% csrf_token %}
 
-<div class="btn-group">
-    <a href="{% url 'new_wallet' %}">
-        <button class="btn btn-primary wallet-create">
-            <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Wallet
-        </button>
-    </a>
+                            <div class="form-group">
+                                <label for="inputWalletName">Wallet Name: </label>
+                                <input id="inputWalletName" type="text" class="form-control" name="name" placeholder="My Credit Card">
+                            </div>
 
-    <form method="POST" class="form-inline" action="{% url 'one_wallet' wallet_id=wallet.id %}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="edit" />
-        <button type="submit" class="btn btn-default wallet-create">
-            <i class="fa fa-lg fa-pencil"></i>&nbsp; Edit Wallet
-        </button>
-    </form>
-</div>
+                            <div class="form-group">
+                                <label class="control-label" for="inputWalletBalance">Starting Balance: </label>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="basic-addon1">$</span>
+                                    <input id="inputWalletBalance" type="number" class="form-control" name="balance" placeholder="0.00" value=0 step=0.01 aria-label="starting balance" aria-describedby="basic-addon1">
+                                </div>
+                            </div>
 
-<div class="panel panel-{% wallet_class wallet.balance %}">
-    <div class="panel-heading">
-        <h3 style="display:inline" class="panel-title">{{ wallet.name }}</h3>
-        <form action="{% url 'one_wallet' wallet_id=wallet.id %}" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="delete" />
-            <button class="btn btn-xs btn-danger pull-right wallet-delete" type="submit">
-                <i class="fa fa-lg fa-trash"></i>&nbsp;Delete
-            </button>
-        </form>
+                            <button class="btn btn-primary" type="submit">Create</button>
+                        </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="panel-body">
+    <div class="modal fade" id="editWalletModal" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Wallet</h5>
+                    <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="form-edit" autocomplete="off" method="POST">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="action" value="edit_complete" />
+
+                        <div class="form-group">
+                            <label for="editWalletName">Wallet Name: </label>
+                            <div class="input-group">
+                                <input id="editWalletName" type="text" class="form-control" name="name" placeholder="My Credit Card" value="{{ wallet.name }}">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-md btn-primary" type="submit">Update Wallet</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteWalletModal" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Wallet</h5>
+                    <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete your "<span class="text-muted walletName"></span>" Wallet?
+                        This will delete any data related to the wallet, such as transactions and categories.</p>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete" />
+                        <button class="btn btn-danger" type="submit">
+                            <i class="fa fa-trash"></i>&nbsp;Delete
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="one-btn-group">
+    <button class="btn btn-primary create-btn" type="button" data-toggle="modal" data-target="#createWalletModal">
+        <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Wallet
+    </button>
+
+    <button type="button" class="btn btn-default one-edit-btn" data-toggle="modal" data-target="#editWalletModal" data-id="{{ wallet.id }}" data-name="{{ wallet.name }}">
+        <i class="fa fa-lg fa-pencil"></i>&nbsp; Edit Wallet
+    </button>
+
+    <button class="btn btn-xs btn-danger pull-right one-delete-btn" type="button" data-toggle="modal" data-target="#deleteWalletModal" data-id="{{ wallet.id }}" data-name="{{ wallet.name }}">
+        <i class="fa fa-lg fa-trash"></i>&nbsp;Delete
+    </button>
+</div>
+
+<div class="card border-{% wallet_class wallet.balance %}">
+    <div class="card-body">
+        <h3 style="display:inline" class="card-title">{{ wallet.name }}</h3>
+
         Balance: 
         <span class="text-{% wallet_class wallet.balance %}">
             ${{ wallet.balance }}
         </span>
     </div>
 
-    <div class="panel-footer">
+    <div class="card-footer">
         Created: {{ wallet.created_time }}
     </div>
 </div> <!-- End of wallet meta info -->
@@ -51,7 +134,7 @@
 <!-- Show all budgets for this wallet -->
 <h2>Budgets</h2>
 {% if budgets %}
-    <table class="table table-striped table-hover table-links">
+    <table id="walletBudgetsTable" class="table table-striped table-hover table-links">
         <thead>
             <tr>
                 <th>Category</th>
@@ -81,7 +164,7 @@
 <!-- Show all transaction for this wallet -->
 <h2>Transactions</h2>
 {% if transactions %}
-    <table class="table table-striped table-hover table-links">
+    <table id="walletTransactionsTable" class="table table-striped table-hover table-links">
         <thead>
             <tr>
                 <th>Amount</th>
@@ -107,5 +190,44 @@
         can create one <a href="{% url 'new_transaction' %}">here</a>.
     </div>
 {% endif %}
+
+<script>
+$(document).ready(function() {
+  $("#walletBudgetsTable").DataTable({
+    dom: 'lrtip',
+    order: [[0, "desc"]],
+    paging: false,
+  });
+
+  $("#walletTransactionsTable").DataTable({
+    dom: 'lrtip',
+    order: [[3, "desc"], [1, "desc"]],
+    paging: false,
+  });
+
+  $('#editWalletModal').on('show.bs.modal', function(event) {
+    var button = $(event.relatedTarget); // button that triggered the modal
+    var walletId = button.data('id');    // extract data
+    var walletName = button.data('name');
+
+    var modal = $(this);
+    modal.find('.form-edit').attr('action', '/pynny/wallets/' + walletId);
+    modal.find('#editWalletName').val(walletName);
+   });
+
+    $('#deleteWalletModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // button that triggered the modal
+        var walletId = button.data('id');    // extract data
+        var walletName = button.data('name');
+
+        var modal = $(this);
+        modal.find('form').attr('action', '/pynny/wallets/' + walletId);
+        modal.find('.walletName').text(walletName);
+    });
+
+});
+
+
+</script>
 
 {% endblock %}

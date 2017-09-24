@@ -254,3 +254,38 @@ body {
   margin: 0px;
   padding: 0px;
 }
+
+.edit-btn, .delete-btn {
+    width: 100%;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.wallet-card {
+    height: 95%;
+    margin-bottom: 4%;
+}
+
+.form-create, .form-edit {
+    margin-top: 20px;
+}
+
+.toggle-btn {
+    border-radius: 10%;
+}
+
+.create-btn {
+}
+
+.one-edit-btn {
+    margin-left: 10px;
+}
+
+.one-btn-group {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    cursor: pointer;
+}
