@@ -1,0 +1,62 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Categories - Pynny{% endblock %}
+
+{% block content %}
+
+<br />
+
+<a href="{% url 'new_category' %}">
+    <button class="btn btn-primary category-create">
+        <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Category
+    </button>
+</a>
+
+<h1>Categories</h1>
+
+{% if categories %}
+    <table class="table table-striped table-hover table-links">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Income?</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+                <tr class="tr-link" data-href="{% url 'one_category' category_id=category.id %}">
+                    <td class="text-{% category_class category.is_income %}">{{ category.name }}</td>
+                    {% if category.is_income %}
+                        <td><i class="fa fa-lg fa-check"></i></td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                    <td>
+                        <form method="POST" class="form-inline" action="{% url 'one_category' category_id=category.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit" />
+                            <button type="submit" class="btn btn-sm btn-primary btn-inline">
+                                <i class="fa fa-lg fa-pencil"></i>
+                            </button>
+                        </form>
+                        <form method="POST" class="form-inline" action="{% url 'one_category' category_id=category.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete" />
+                            <button type="submit" class="btn btn-sm btn-danger btn-inline">
+                                <i class="fa fa-lg fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't created any Categories yet. Get started 
+        by clicking <a href="{% url 'new_category' %}">New Category</a>.
+    </div>
+{% endif %}
+
+{% endblock %}

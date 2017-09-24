@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load pynny_extras %}
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap 4 CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+        <!-- JQuery -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+        <!-- Popper.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+
+        <!-- Bootstrap 4 JS -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+
+        <!-- Data Viz -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script> <!-- D3 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.min.css"> <!-- NVD3 -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.min.js"></script> <!-- NVD3 -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.5.2/randomColor.min.js"></script> <!-- RandomColor -->
+
+        <!-- Icons -->
+        <link href="{% static 'pynny/css/font-awesome.min.css' %}" rel="stylesheet">
+
+        <!-- Pynny CSS & JS -->
+        <link rel="stylesheet" href="{% static 'pynny/pynny.css' %}">
+        <script type="text/javascript" src="{% static 'pynny/script.js' %}"></script>
+
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Lobster|Montserrat|Pacifico" rel="stylesheet">
+    </head>
+
+
+    <body>
+        <!--<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" role="navigation">-->
+            <!--<a class="navbar-brand" href="#">Pynny</a>-->
+            <!--<button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">-->
+                <!--<span class="navbar-toggler-icon"></span>-->
+            <!--</button>-->
+
+            <!--<div class="collapse navbar-collapse" id="navbarsExampleDefault">-->
+                <!--<ul class="navbar-nav mr-auto">-->
+                  <!--<li class="nav-item">-->
+                    <!--<a class="nav-link" href="#">Settings</a>-->
+                  <!--</li>-->
+                  <!--<li class="nav-item">-->
+                    <!--<a class="nav-link" href="{% url 'logout' %}">Logout</a>-->
+                  <!--</li>-->
+                <!--</ul>-->
+                <!--<form class="form-inline mt-2 mt-md-0">-->
+                  <!--<input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">-->
+                  <!--<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+                <!--</form>-->
+            <!--</div>-->
+        <!--</nav>-->
+
+
+        <div class="nav-side-menu">
+            <div class="brand">Pynny</div>
+            <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
+            <div class="menu-list">
+                <ul id="menu-content" class="menu-content collapse out">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'dashboard' %}"><i class="fa fa-lg fa-tachometer" aria-hidden="true"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fa fa-lg fa-file" aria-hidden="true"></i> Reporting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'wallets' %}"><i class="fa fa-lg fa-bank" aria-hidden="true"></i> Wallets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'categories' %}"><i class="fa fa-lg fa-archive" aria-hidden="true"></i> Categories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'budgets' %}"><i class="fa fa-lg fa-balance-scale" aria-hidden="true"></i> Budgets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'transactions' %}"><i class="fa fa-lg fa-exchange" aria-hidden="true"></i> Transactions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fa fa-lg fa-money" aria-hidden="true"></i> Debt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fa fa-lg fa-hourglass-half"></i> Savings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fa fa-lg fa-cogs"></i> Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}"><i class="fa fa-lg fa-power-off"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container-fluid" id="main">
+            <div class="row">
+                <div class="col-md-12">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

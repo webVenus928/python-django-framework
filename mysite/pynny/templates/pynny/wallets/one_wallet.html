@@ -1,0 +1,111 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}{{ wallet.name.title }} Wallet - Pynny{% endblock %}
+
+{% block content %}
+
+<br />
+
+<div class="btn-group">
+    <a href="{% url 'new_wallet' %}">
+        <button class="btn btn-primary wallet-create">
+            <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Wallet
+        </button>
+    </a>
+
+    <form method="POST" class="form-inline" action="{% url 'one_wallet' wallet_id=wallet.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="edit" />
+        <button type="submit" class="btn btn-default wallet-create">
+            <i class="fa fa-lg fa-pencil"></i>&nbsp; Edit Wallet
+        </button>
+    </form>
+</div>
+
+<div class="panel panel-{% wallet_class wallet.balance %}">
+    <div class="panel-heading">
+        <h3 style="display:inline" class="panel-title">{{ wallet.name }}</h3>
+        <form action="{% url 'one_wallet' wallet_id=wallet.id %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete" />
+            <button class="btn btn-xs btn-danger pull-right wallet-delete" type="submit">
+                <i class="fa fa-lg fa-trash"></i>&nbsp;Delete
+            </button>
+        </form>
+    </div>
+
+    <div class="panel-body">
+        Balance: 
+        <span class="text-{% wallet_class wallet.balance %}">
+            ${{ wallet.balance }}
+        </span>
+    </div>
+
+    <div class="panel-footer">
+        Created: {{ wallet.created_time }}
+    </div>
+</div> <!-- End of wallet meta info -->
+
+<hr />
+
+<!-- Show all budgets for this wallet -->
+<h2>Budgets</h2>
+{% if budgets %}
+    <table class="table table-striped table-hover table-links">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Used / Goal</th>
+                <th>Month</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for budget in budgets %}
+                <tr class="tr-link {% budget_class budget %}" data-href="{% url 'one_budget' budget_id=budget.id %}">
+                    <td>{{ budget.category.name }}</td>
+                    <td>${{ budget.balance }} / ${{ budget.goal }}</td>
+                    <td>{% get_month budget.month %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't created any Budgets for this Wallet yet. You can 
+        create one <a href="{% url 'new_budget' %}">here</a>.
+    </div>
+{% endif %}
+
+<br />
+
+<!-- Show all transaction for this wallet -->
+<h2>Transactions</h2>
+{% if transactions %}
+    <table class="table table-striped table-hover table-links">
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trans in transactions %}
+                <tr class="tr-link" data-href="{% url 'one_transaction' transaction_id=trans.id %}">
+                    <td>${{ trans.amount }}</td>
+                    <td>{{ trans.category.name }}</td>
+                    <td>{{ trans.description }}</td>
+                    <td>{{ trans.created_time }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't recorded any Transactions for this Wallet yet. You 
+        can create one <a href="{% url 'new_transaction' %}">here</a>.
+    </div>
+{% endif %}
+
+{% endblock %}

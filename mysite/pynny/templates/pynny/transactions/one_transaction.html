@@ -1,0 +1,63 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Transaction #{{ transaction.id }} for {{ transaction.wallet.name }} Wallet - Pynny{% endblock %}
+
+{% block content %}
+
+<br />
+
+<div class="btn-group">
+    <a href="{% url 'new_transaction' %}">
+        <button class="btn btn-primary transaction-create">
+            <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Transaction
+        </button>
+    </a>
+
+    <form method="POST" class="form-inline" action="{% url 'one_transaction' transaction_id=transaction.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="edit" />
+        <button type="submit" class="btn btn-default transaction-create">
+            <i class="fa fa-lg fa-pencil"></i>&nbsp; Edit Transaction
+        </button>
+    </form>
+</div>
+
+<br />
+
+<div class="panel panel-{% transaction_class transaction %}">
+    <div class="panel-heading">
+        <h3 style="display:inline" class="panel-title">Transaction #{{ transaction.id }}</h3>
+        <form action="{% url 'one_transaction' transaction_id=transaction.id %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete" />
+            <button class="btn btn-xs btn-danger pull-right transaction-delete" type="submit">
+                <i class="fa fa-lg fa-trash"></i>&nbsp;Delete Transaction
+            </button>
+        </form>
+    </div>
+
+    <div class="panel-body">
+        <p>Amount: 
+            <span class="text-{% transaction_class transaction %}">${{ transaction.amount }}</span>
+        </p>
+        <p>Category: 
+            <a href="{% url 'one_category' category_id=transaction.category.id %}" class="text-{% category_class transaction.category.is_income %}">
+                {{ transaction.category.name }}
+            </a>
+        </p>
+        <p>Wallet: 
+            <a href="{% url 'one_wallet' wallet_id=transaction.wallet.id %}" class="text-{% wallet_class transaction.wallet.balance %}">
+                <span class="text-{% wallet_class transaction.wallet.balance %}">
+                    {{ transaction.wallet.name }}
+                </span>
+            </a>
+        </p>
+    </div>
+
+    <div class="panel-footer">
+        {{ transaction.created_time }}
+    </div>
+</div> <!-- End of transaction meta info -->
+
+<hr />
+{% endblock %}

@@ -15,6 +15,7 @@ from .views import wallet_views, budget_views, category_views, transaction_views
 
 urlpatterns = [
     url(r'^$', main_views.index, name='index'), # /
+    url(r'^dashboard/$', main_views.index, name='dashboard'),  # /dashboard/
     url(r'^login/$', auth_views.login, name='login'), # /login/
     url(r'^logout/$', main_views.logout_view, name='logout'), # /logout/
     url(r'^wallets/$', wallet_views.wallets, name='wallets'), # /wallets/

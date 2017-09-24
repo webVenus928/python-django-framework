@@ -1,0 +1,75 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Budgets - Pynny{% endblock %}
+
+{% block content %}
+
+<br />
+
+<a href="{% url 'new_budget' %}">
+    <button class="btn btn-primary wallet-create">
+        <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Budget
+    </button>
+</a>
+<a href="{% url 'renew_budgets' %}">
+    <button class="btn wallet-create">
+        <i class="fa fa-lg fa-refresh"></i> Renew Last Month's Budgets
+    </button>
+</a>
+
+{% if budgets %}
+    {% for budget in budgets %}
+        <div class="panel panel-{% budget_class budget %} budget-panel">
+            <div class="panel-heading">
+                <a href="{% url 'one_budget' budget_id=budget.id %}">
+                    <h3 style="display:inline" class="panel-title">{{ budget.category.name }} - {{ budget.wallet.name }}</h3>
+                </a>
+
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <form method="POST" class="form-inline" action="{% url 'one_budget' budget_id=budget.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit" />
+                    <button type="submit" class="btn btn-xs btn-primary btn-inline">
+                        <i class="fa fa-lg fa-pencil"></i>&nbsp;Edit
+                    </button>
+                </form>
+
+                <form action="{% url 'one_budget' budget_id=budget.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete" />
+                    <button class="btn btn-xs btn-danger pull-right budget-delete" type="submit">
+                        <i class="fa fa-lg fa-trash"></i>&nbsp;Delete
+                    </button>
+                </form>
+            </div>
+
+            <div class="panel-body">
+                <p>Balance: ${{ budget.balance }}</p>
+                <p>Goal: ${{ budget.goal }}</p>
+                <p>Category: <a href="{% url 'one_category' category_id=budget.category.id %}">
+                    {{ budget.category.name }}
+                    </a>
+                </p>
+                <p>Wallet: <a href="{% url 'one_wallet' wallet_id=budget.wallet.id %}">
+                    {{ budget.wallet.name }}
+                    </a>
+                </p>
+            </div>
+
+            <div class="panel-footer">
+                {% get_month budget.month %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't created any Budgets yet. Get started 
+        by clicking <a href="{% url 'new_budget' %}">New Budget</a>.
+    </div>
+    <div class="alert alert-info">
+        <strong>Missing Budgets?</strong> If you have Budgets from the previous month you'd like to renew for
+        the current one, click <a href="{% url 'renew_budgets' %}">Renew Budgets</a>.
+    </div>
+{% endif %}
+
+{% endblock %}

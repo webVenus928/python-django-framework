@@ -53,7 +53,7 @@ def index(request):
         data['transactions_per_category_colors'].append(colors[color_index])
         color_index = (color_index + 1) % len(colors)
 
-    return render(request, 'pynny/dashboard.html', context=data)
+    return render(request, 'pynny/base/dashboard.html', context=data)
 
 
 @login_required(login_url='/pynny/login')

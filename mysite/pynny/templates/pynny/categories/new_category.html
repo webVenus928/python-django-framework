@@ -1,0 +1,29 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}New Category - Pynny{% endblock %}
+
+{% block content %}
+
+<form action="{% url 'categories' %}" autocomplete="off" method="POST" id="new_category_form">
+    {% csrf_token %}
+
+    <input type="hidden" name="action" value="create" />
+                        
+    <div class="input-group">
+        <label for="name">Category Name: </label>
+        <input type="text" class="form-control" name="name" placeholder="Groceries">
+    </div>
+
+    <br />
+
+    <div class="input-group">
+        <label for="is_income">Is Income:&nbsp;&nbsp;</label>
+        <input type="checkbox" name="is_income" value=0>
+    </div>
+
+    <br />
+
+    <button class="btn btn-md btn-primary" type="submit">Create</button>
+</form>
+
+{% endblock %}

@@ -41,7 +41,7 @@ def budgets(request):
         # Get the wallets for this user
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
 
-        return render(request, 'pynny/budgets.html', context=data)
+        return render(request, 'pynny/budgets/budgets.html', context=data)
     # POST = create a new Budget
     elif request.method == 'POST':
         # Get the form data from the request
@@ -60,7 +60,7 @@ def budgets(request):
         # Check if the budget already exists
         if Budget.objects.filter(user=request.user, category=category, wallet=wallet, month__contains=date.strftime(date.today(), '%Y-%m')):
             data = {'alerts': {'errors': ['<strong>Oops!</strong> A Budget already exists for that Wallet and Category, for this month']}}
-            return render(request, 'pynny/new_budget.html', context=data)
+            return render(request, 'pynny/budgets/new_budget.html', context=data)
 
         # Create the new Budget
         try:
@@ -72,7 +72,7 @@ def budgets(request):
         Budget(category=category, wallet=wallet, goal=_goal, balance=_start_balance, user=request.user, budget_id=new_id).save()
         data = {'alerts': {'success': ['<strong>Done!</strong> New Budget created successfully!']}}
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
-        return render(request, 'pynny/budgets.html', context=data, status=201)
+        return render(request, 'pynny/budgets/budgets.html', context=data, status=201)
 
 
 @login_required(login_url='/pynny/login')
@@ -92,7 +92,7 @@ def new_budget(request):
                 ]
             },
         }
-        return render(request, 'pynny/new_category.html', context=data)
+        return render(request, 'pynny/categories/new_category.html', context=data)
 
     if not data['wallets']:
         data = {
@@ -102,10 +102,10 @@ def new_budget(request):
                 ]
             },
         }
-        return render(request, 'pynny/new_wallet.html', context=data)
+        return render(request, 'pynny/wallets/new_wallet.html', context=data)
 
     # They have a wallet and category so continue
-    return render(request, 'pynny/new_budget.html', context=data)
+    return render(request, 'pynny/budgets/new_budget.html', context=data)
 
 
 @login_required(login_url='/pynny/login')
@@ -120,12 +120,12 @@ def one_budget(request, budget_id):
         # DNE
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Budget does not exist.']}
-        return render(request, 'pynny/budgets.html', context=data, status=404)
+        return render(request, 'pynny/budgets/budgets.html', context=data, status=404)
 
     if budget.user != request.user:
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Budget isn\'t yours! You don\'t have permission to view it']}
-        return render(request, 'pynny/budgets.html', context=data, status=403)
+        return render(request, 'pynny/budgets/budgets.html', context=data, status=403)
 
     if request.method == "POST":
         # What kind of action?
@@ -138,13 +138,13 @@ def one_budget(request, budget_id):
             # And return them to the budgets page
             data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
             data['alerts'] = {'success': ['<strong>Done!</strong> Budget was deleted successfully']}
-            return render(request, 'pynny/budgets.html', context=data)
+            return render(request, 'pynny/budgets/budgets.html', context=data)
         elif action == 'edit':
             # Render the edit_budget view
             data['budget'] = budget
             data['categories'] = BudgetCategory.objects.filter(user=request.user)
             data['wallets'] = Wallet.objects.filter(user=request.user)
-            return render(request, 'pynny/edit_budget.html', context=data)
+            return render(request, 'pynny/budgets/edit_budget.html', context=data)
         elif action == 'edit_complete':
             # Get the form data from the request
             _category = int(request.POST['category'])
@@ -162,9 +162,9 @@ def one_budget(request, budget_id):
 
             data = {'alerts': {'success': ['<strong>Done!</strong> Budget updated successfully!']}}
             data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
-            return render(request, 'pynny/budgets.html', context=data)
+            return render(request, 'pynny/budgets/budgets.html', context=data)
     elif request.method == 'GET':
         # Show the specific Budget data
         data['budget'] = budget
         data['transactions'] = Transaction.objects.filter(category=budget.category).order_by('-created_time')
-        return render(request, 'pynny/one_budget.html', context=data)
+        return render(request, 'pynny/budgets/one_budget.html', context=data)
