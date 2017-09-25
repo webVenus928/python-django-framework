@@ -20,6 +20,9 @@ def transactions(request):
     data = {}
     if request.method == 'GET':
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+        data['default_date'] = date.strftime(date.today(), '%Y-%m-%d')
         return render(request, 'pynny/transactions/transactions.html', context=data)
     # POST = create a new Transaction
     elif request.method == 'POST':
@@ -55,6 +58,8 @@ def transactions(request):
         # Render the transactions
         data = {'alerts': {'success': ['<strong>Done!</strong> New Transaction recorded successfully!']}}
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
         return render(request, 'pynny/transactions/transactions.html', context=data, status=201)
 
 
@@ -134,6 +139,8 @@ def one_transaction(request, transaction_id):
 
             # And return them to the Transactions page
             data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            data['wallets'] = Wallet.objects.filter(user=request.user)
             data['alerts'] = {'info': ['<strong>Done!</strong> Transaction was deleted successfully']}
             return render(request, 'pynny/transactions/transactions.html', context=data)
         elif action == 'edit':
@@ -186,10 +193,14 @@ def one_transaction(request, transaction_id):
 
             data = {'alerts': {'success': ['<strong>Done!</strong> Transaction updated successfully!']}}
             data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            data['wallets'] = Wallet.objects.filter(user=request.user)
             return render(request, 'pynny/transactions/transactions.html', context=data)
     elif request.method == 'GET':
         # Show the specific Transaction data
         data['transaction'] = transaction
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
         return render(request, 'pynny/transactions/one_transaction.html', context=data)
 
 

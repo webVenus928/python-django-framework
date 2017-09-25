@@ -112,6 +112,7 @@
             <div class="row">
                 <div class="col-md-12">
                     {% if alerts %}
+                        <br />
                         {% if alerts.success %}
                             {% for alert in alerts.success %}
                                 <div class="alert alert-success">{% autoescape off %}{{ alert }}{% endautoescape %}</div>

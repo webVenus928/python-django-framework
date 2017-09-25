@@ -108,11 +108,13 @@
     {% for wallet in wallets %}
     <div class="col col-md-4">
         <div class="card border-{% wallet_class wallet.balance %} wallet-card">
-            <div class="card-body">
+            <div class="card-header">
                 <a class="text-dark" href="{% url 'one_wallet' wallet_id=wallet.id %}">
                     <h4 class="card-title">{{ wallet.name }}</h4>
                 </a>
+            </div>
 
+            <div class="card-body">
                 Balance:
                 <span class="text-{% wallet_class wallet.balance %}">
                     ${{ wallet.balance }}
