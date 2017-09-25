@@ -1,0 +1,22 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Edit Wallet {{ wallet.name }} - Pynny{% endblock %}
+
+{% block content %}
+
+<form class="form-edit" action="{% url 'one_wallet' wallet_id=wallet.id %}" autocomplete="off" method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" name="action" value="edit_complete" />
+
+    <div class="form-group">
+        <label for="editWalletName">Wallet Name: </label>
+        <div class="input-group">
+            <input id="editWalletName" type="text" class="form-control" name="name" placeholder="My Credit Card" value="{{ wallet.name }}">
+        </div>
+    </div>
+
+    <button class="btn btn-md btn-primary" type="submit">Update Wallet</button>
+</form>
+
+{% endblock %}

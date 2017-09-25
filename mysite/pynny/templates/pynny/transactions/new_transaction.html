@@ -1,0 +1,59 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}New Transaction - Pynny{% endblock %}
+
+{% block content %}
+
+<form action="{% url 'transactions' %}" autocomplete="off" method="POST" id="new_transaction_form">
+    {% csrf_token %}
+
+    <input type="hidden" name="action" value="create" />
+
+    <div class="input-group">
+        <label for="category">Category: </label>
+        <select name="category" class="form-control">
+            {% for category in categories %}
+                <option class="text-{% category_class category.is_income %}" value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br />
+
+    <div class="input-group">
+        <label for="wallet">Wallet: </label>
+        <select name="wallet" class="form-control">
+            {% for wallet in wallets %}
+                <option value="{{ wallet.id }}">{{ wallet.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br />
+
+    <label for="amount">Amount: </label>             
+    <div class="input-group">
+        <span class="input-group-addon">$</span>
+        <input type="number" class="form-control" name="amount" step=0.01 value=0>
+    </div>
+
+    <br />
+
+    <label for="description">Description: </label>
+    <div class="input-group">
+        <input type="text" class="form-control" name="description" placeholder="groceries at the food market">
+    </div>
+
+    <br />
+
+    <label for="created_time">Recorded At: </label>
+    <div class="input-group">
+        <input type="date" class="form-control" name="created_time" step=1 value="{{ default_date }}">
+    </div>
+
+    <br />
+
+    <button class="btn btn-md btn-primary" type="submit">Record Transaction</button>
+</form>
+
+{% endblock %}

@@ -20,7 +20,10 @@ def transactions(request):
     data = {}
     if request.method == 'GET':
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
-        return render(request, 'pynny/transactions.html', context=data)
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+        data['default_date'] = date.strftime(date.today(), '%Y-%m-%d')
+        return render(request, 'pynny/transactions/transactions.html', context=data)
     # POST = create a new Transaction
     elif request.method == 'POST':
         # Get the form data from the request
@@ -55,7 +58,9 @@ def transactions(request):
         # Render the transactions
         data = {'alerts': {'success': ['<strong>Done!</strong> New Transaction recorded successfully!']}}
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
-        return render(request, 'pynny/transactions.html', context=data, status=201)
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+        return render(request, 'pynny/transactions/transactions.html', context=data, status=201)
 
 
 @login_required(login_url='/pynny/login')
@@ -74,7 +79,7 @@ def new_transaction(request):
                 ]
             },
         }
-        return render(request, 'pynny/new_category.html', context=data)
+        return render(request, 'pynny/categories/new_category.html', context=data)
 
     if not data['wallets']:
         data = {
@@ -84,11 +89,11 @@ def new_transaction(request):
                 ]
             },
         }
-        return render(request, 'pynny/new_wallet.html', context=data)
+        return render(request, 'pynny/wallets/new_wallet.html', context=data)
 
     # They have a wallet and category so continue
     data['default_date'] = date.strftime(date.today(), '%Y-%m-%d')
-    return render(request, 'pynny/new_transaction.html', context=data)
+    return render(request, 'pynny/transactions/new_transaction.html', context=data)
 
 
 @login_required(login_url='/pynny/login')
@@ -103,12 +108,12 @@ def one_transaction(request, transaction_id):
         # DNE
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
-        return render(request, 'pynny/transactions.html', context=data, status=404)
+        return render(request, 'pynny/transactions/transactions.html', context=data, status=404)
 
     if transaction.user != request.user:
         data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Transaction does not exist.']}
-        return render(request, 'pynny/transactions.html', context=data, status=403)
+        return render(request, 'pynny/transactions/transactions.html', context=data, status=403)
 
     if request.method == "POST":
         # What kind of POST was this?
@@ -134,14 +139,16 @@ def one_transaction(request, transaction_id):
 
             # And return them to the Transactions page
             data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            data['wallets'] = Wallet.objects.filter(user=request.user)
             data['alerts'] = {'info': ['<strong>Done!</strong> Transaction was deleted successfully']}
-            return render(request, 'pynny/transactions.html', context=data)
+            return render(request, 'pynny/transactions/transactions.html', context=data)
         elif action == 'edit':
             # Render the edit_transaction view
             data['transaction'] = transaction
             data['categories'] = BudgetCategory.objects.filter(user=request.user)
             data['wallets'] = Wallet.objects.filter(user=request.user)
-            return render(request, 'pynny/edit_transaction.html', context=data)
+            return render(request, 'pynny/transactions/edit_transaction.html', context=data)
         elif action == 'edit_complete':
             # Get the form data from the request
             _category = int(request.POST['category'])
@@ -186,11 +193,15 @@ def one_transaction(request, transaction_id):
 
             data = {'alerts': {'success': ['<strong>Done!</strong> Transaction updated successfully!']}}
             data['transactions'] = Transaction.objects.filter(user=request.user).order_by('-created_time')
-            return render(request, 'pynny/transactions.html', context=data)
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            data['wallets'] = Wallet.objects.filter(user=request.user)
+            return render(request, 'pynny/transactions/transactions.html', context=data)
     elif request.method == 'GET':
         # Show the specific Transaction data
         data['transaction'] = transaction
-        return render(request, 'pynny/one_transaction.html', context=data)
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
+        return render(request, 'pynny/transactions/one_transaction.html', context=data)
 
 
 def undo_transaction(trans):

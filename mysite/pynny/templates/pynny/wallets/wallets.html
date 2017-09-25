@@ -1,0 +1,171 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Wallets - Pynny{% endblock %}
+
+{% block content %}
+
+<button class="btn btn-primary one-btn-group" type="button" data-toggle="modal" data-target="#createWalletModal">
+    <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Wallet
+</button>
+
+{% if wallets %}
+<div class="row">
+    <div class="modal fade" id="createWalletModal" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Wallet</h5>
+                    <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="form-horizontal" action="{% url 'wallets' %}" autocomplete="off" method="POST">
+                    {% csrf_token %}
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label for="inputWalletName">Wallet Name: </label>
+                            <input id="inputWalletName" type="text" class="form-control" name="name" placeholder="My Credit Card">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label" for="inputWalletBalance">Starting Balance: </label>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1">$</span>
+                                <input id="inputWalletBalance" type="number" class="form-control" name="balance" placeholder="0.00" value=0 step=0.01 aria-label="starting balance" aria-describedby="basic-addon1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editWalletModal" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Wallet</h5>
+                    <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="form-edit" autocomplete="off" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <input type="hidden" name="action" value="edit_complete" />
+
+                        <div class="form-group">
+                            <label for="editWalletName">Wallet Name: </label>
+                            <div class="input-group">
+                                <input id="editWalletName" type="text" class="form-control" name="name" placeholder="My Credit Card" value="{{ wallet.name }}">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteWalletModal" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Wallet</h5>
+                    <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete your "<span class="text-muted walletName"></span>" Wallet?
+                        This will delete any data related to the wallet, such as transactions and categories.</p>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete" />
+                        <button class="btn btn-danger" type="submit">
+                            <i class="fa fa-trash"></i>&nbsp;Delete
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for wallet in wallets %}
+    <div class="col col-md-4">
+        <div class="card border-{% wallet_class wallet.balance %} wallet-card">
+            <div class="card-header">
+                <a class="text-dark" href="{% url 'one_wallet' wallet_id=wallet.id %}">
+                    <h4 class="card-title">{{ wallet.name }}</h4>
+                </a>
+            </div>
+
+            <div class="card-body">
+                Balance:
+                <span class="text-{% wallet_class wallet.balance %}">
+                    ${{ wallet.balance }}
+                </span>
+            </div>
+
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <button type="button" class="btn btn-sm btn-primary btn-inline edit-btn" data-toggle="modal" data-target="#editWalletModal" data-id="{{ wallet.id }}" data-name="{{ wallet.name }}">
+                        <i class="fa fa-pencil"></i>&nbsp;Edit
+                    </button>
+                    <button class="btn btn-sm btn-danger btn-inline delete-btn" type="button" data-toggle="modal" data-target="#deleteWalletModal" data-id="{{ wallet.id }}" data-name="{{ wallet.name }}">
+                        <i class="fa fa-trash"></i>&nbsp;Delete
+                    </button>
+                </li>
+            </ul>
+
+            <div class="card-footer">
+                Created: {{ wallet.created_time }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't created any Wallets yet. Get started 
+        by clicking <a href="{% url 'new_wallet' %}">New Wallet</a>.
+    </div>
+{% endif %}
+
+<script>
+    $(document).ready(function() {
+        $('#editWalletModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var walletId = button.data('id');    // extract data
+            var walletName = button.data('name');
+
+            var modal = $(this);
+            modal.find('.form-edit').attr('action', '/pynny/wallets/' + walletId);
+            modal.find('#editWalletName').val(walletName);
+        });
+
+        $('#deleteWalletModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var walletId = button.data('id');    // extract data
+            var walletName = button.data('name');
+
+            var modal = $(this);
+            modal.find('form').attr('action', '/pynny/wallets/' + walletId);
+            modal.find('.walletName').text(walletName);
+        });
+    });
+</script>
+
+{% endblock %}

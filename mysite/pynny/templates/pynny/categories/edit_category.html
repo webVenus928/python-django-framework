@@ -1,0 +1,29 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Edit Category {{ category.name }} - Pynny{% endblock %}
+
+{% block content %}
+
+<form action="{% url 'one_category' category_id=category.id %}" autocomplete="off" method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" name="action" value="edit_complete">
+                        
+    <div class="input-group">
+        <label for="name">Category Name: </label>
+        <input id="name" type="text" class="form-control" name="name" placeholder="Groceries" value="{{ category.name }}">
+    </div>
+
+    <br />
+
+    <div class="input-group">
+        <label for="is_income">Is Income:&nbsp;&nbsp;</label>
+        <input id="is_income" type="checkbox" name="is_income" value=0 {% if category.is_income %} checked {% endif %}>
+    </div>
+
+    <br />
+
+    <button class="btn btn-md btn-primary" type="submit">Update Category</button>
+</form>
+
+{% endblock %}

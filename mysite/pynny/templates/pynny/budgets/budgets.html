@@ -1,0 +1,282 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Budgets - Pynny{% endblock %}
+
+{% block content %}
+
+<div class="modal fade" id="createBudgetModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Budget</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{% url 'budgets' %}" autocomplete="off" method="POST" id="new_budget_form">
+                {% csrf_token %}
+                <div class="modal-body">
+
+                    <label for="inputBudgetCategory">Budget Category: </label>
+                    <div class="input-group">
+                        <select id="inputBudgetCategory" name="category" class="form-control">
+                            {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="inputBudgetWallet">Wallet: </label>
+                    <div class="input-group">
+                        <select id="inputBudgetWallet" name="wallet" class="form-control">
+                            {% for wallet in wallets %}
+                                <option value="{{ wallet.id }}">{{ wallet.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="inputBudgetGoal">Goal: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <input id="inputBudgetGoal" type="number" class="form-control" step=0.01 value=0 name="goal">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editBudgetModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Budget</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form class="form-edit" autocomplete="off" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="edit_complete" />
+
+                    <label for="editBudgetCategory">Budget Category: </label>
+                    <div class="input-group">
+                        <select id="editBudgetCategory" name="category" class="form-control">
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" class="text-{% category_class category.is_income %}" {% if budget.category.id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="editBudgetWallet">Wallet: </label>
+                    <div class="input-group">
+                        <select id="editBudgetWallet" name="wallet" class="form-control">
+                            {% for wallet in wallets %}
+                                <option value="{{ wallet.id }}" class="text-{% wallet_class wallet.balance %}" {% if budget.wallet.id == wallet.id %}selected {% endif %}>{{ wallet.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="editBudgetGoal">Goal: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <input id="editBudgetGoal" type="number" class="form-control" step=0.01 value={{ budget.goal }} name="goal">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteBudgetModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Budget</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the "<span class="text-muted categoryName"></span>" Budget for your "<span class="text-muted walletName"></span>" Wallet?</p>
+
+                <form class="form-delete" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete" />
+                    <button class="btn btn-danger" type="submit">
+                        <i class="fa fa-trash"></i>&nbsp;Delete
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="renewBudgetsModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            {% if not last_month_budgets %}
+                <div class="modal-header">
+                    <h5 clsas="modal-title">No Budgets Last Month</h5>
+                </div>
+                <div clas="modal-body">
+                    <p>You do not have any budgets from the previous month. You'll have to create new budgets.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            {% else %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Renew Budgets</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to renew these Budgets?</p>
+                    <ul class="list-group">
+                        {% for lastBudget in last_month_budgets %}
+                            <li class="list-group-item">
+                                {{ lastBudget.category.name }} - {{ lastBudget.wallet.name }} (${{ lastBudget.goal }})
+                            </li>
+                        {% endfor %}
+                        <br />
+                    </ul>
+
+                    <form method="GET" action="{% url 'renew_budgets' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete" />
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fa fa-refresh"></i>&nbsp;Renew
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="one-btn-group">
+    <button class="btn btn-primary wallet-create" type="button" data-toggle="modal" data-target="#createBudgetModal">
+        <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Budget
+    </button>
+    <button class="btn wallet-create" type="button" data-toggle="modal" data-target="#renewBudgetsModal">
+        <i class="fa fa-lg fa-refresh"></i> Renew Last Month's Budgets
+    </button>
+</div>
+
+{% if budgets %}
+    <div class="row">
+        {% for budget in budgets %}
+            <div class="col col-md-4">
+                <div class="card border-{% budget_class budget %} budget-card">
+                    <div class="card-header">
+                        <a href="{% url 'one_budget' budget_id=budget.id %}">
+                            <h3 style="display:inline" class="card-title">{{ budget.category.name }} - {{ budget.wallet.name }}</h3>
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col col-lg-6">
+                                        <p>Balance: ${{ budget.balance }}</p>
+                                        <p>Goal: ${{ budget.goal }}</p>
+                                    </div>
+                                    <div class="col col-lg-6">
+                                        <p>Category: <a href="{% url 'one_category' category_id=budget.category.id %}">
+                                            {{ budget.category.name }}
+                                            </a>
+                                        </p>
+                                        <p>Wallet: <a href="{% url 'one_wallet' wallet_id=budget.wallet.id %}">
+                                            {{ budget.wallet.name }}
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col col-lg-6">
+                                        <button type="button" class="btn btn-sm btn-primary edit-btn" data-toggle="modal" data-target="#editBudgetModal" data-id="{{ budget.id }}" data-category="{{ budget.category.id }}" data-wallet="{{ budget.wallet.id }}" data-goal="{{ budget.goal }}" data-balance="{{ budget.balance }}" data-month="{{ budget.month }}">
+                                            <i class="fa fa-lg fa-pencil"></i>&nbsp;Edit
+                                        </button>
+                                    </div>
+                                    <div class="col col-lg-6">
+                                        <button class="btn btn-sm btn-danger delete-btn" type="button" data-toggle="modal" data-target="#deleteBudgetModal" data-id="{{ budget.id }}" data-category-name="{{ budget.category.name }}" data-wallet-name="{{ budget.wallet.name }}">
+                                            <i class="fa fa-lg fa-trash"></i>&nbsp;Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card-footer">
+                        Budget Month: {% get_month budget.month %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't created any Budgets yet. Get started 
+        by clicking <a href="{% url 'new_budget' %}">New Budget</a>.
+    </div>
+    <div class="alert alert-info">
+        <strong>Missing Budgets?</strong> If you have Budgets from the previous month you'd like to renew for
+        the current one, click <a href="{% url 'renew_budgets' %}">Renew Budgets</a>.
+    </div>
+{% endif %}
+
+<script>
+    $(document).ready(function() {
+
+        $('#editBudgetModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var budgetId = button.data('id');    // extract data
+            var budgetCategoryId = button.data('category');
+            var budgetWalletId = button.data('wallet');
+            var budgetGoal = button.data('goal');
+            var budgetBalance = button.data('balance');
+            var budgetMonth = button.data('month');
+
+            var modal = $(this);
+            modal.find('.form-edit').attr('action', '/pynny/budgets/' + budgetId);
+            modal.find('#optionCategory' + budgetCategoryId).prop('selected', true);
+            modal.find('#optionWallet' + budgetWalletId).prop('selected', true);
+            modal.find('#editBudgetGoal').val(budgetGoal);
+            modal.find('#editBudgetBalance').val(budgetBalance);
+            modal.find('#editBudgetMonth').val(budgetMonth);
+        });
+
+        $('#deleteBudgetModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var budgetId = button.data('id');    // extract data
+            var budgetCategoryName = button.data('category-name');
+            var budgetWalletName = button.data('wallet-name');
+
+            var modal = $(this);
+            modal.find('form').attr('action', '/pynny/budgets/' + budgetId);
+            modal.find('.categoryName').text(budgetCategoryName);
+            modal.find('.walletName').text(budgetWalletName);
+        });
+    });
+</script>
+
+
+{% endblock %}

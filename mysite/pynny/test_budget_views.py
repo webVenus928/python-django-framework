@@ -54,6 +54,9 @@ class BudgetViewsTests(TestCase):
         self.other_user.delete()
 
     def test_renew_budgets(self):
+        last_month = datetime.date(datetime.date.today().year, datetime.date.today().month - 1 if datetime.date.today().month > 1 else 12, 1)
+        self.budget.month = last_month
+        self.budget.save()
         resp = self.client.get(reverse('renew_budgets'))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(len(Budget.objects.filter(budget_id=1)), 2)
