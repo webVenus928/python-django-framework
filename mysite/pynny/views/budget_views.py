@@ -19,15 +19,18 @@ def renew_budgets(request):
     if request.user.is_authenticated():
         all_budgets = Budget.objects.filter(user=request.user)
         renewed = set()
-        for budget in all_budgets:
+        today = date.today()
+        last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+        last_month_budgets = Budget.objects.filter(user=request.user,
+                                                           month__contains=date.strftime(last_month, '%Y-%m'))
+        for budget in last_month_budgets:
             if budget.budget_id not in renewed:
-                latest_version = Budget.objects.filter(user=request.user, budget_id=budget.budget_id).latest('month')
-                if latest_version.month.year != date.today().year or latest_version.month.month != date.today().month:
-                    renewed_budget = Budget.objects.get(pk=latest_version.pk)
-                    renewed_budget.pk = None
-                    renewed_budget.month = date.today()
-                    renewed_budget.save()
-                    renewed.add(budget.budget_id)
+                renewed_budget = Budget.objects.get(pk=budget.pk)
+                renewed_budget.pk = None
+                renewed_budget.month = date.today()
+                renewed_budget.balance = decimal.Decimal('0')
+                renewed_budget.save()
+                renewed.add(budget.budget_id)
     return budgets(request)
 
 
@@ -40,6 +43,11 @@ def budgets(request):
 
         # Get the wallets for this user
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
+        today = date.today()
+        last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+        data['last_month_budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(last_month, '%Y-%m'))
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
 
         return render(request, 'pynny/budgets/budgets.html', context=data)
     # POST = create a new Budget
@@ -60,6 +68,12 @@ def budgets(request):
         # Check if the budget already exists
         if Budget.objects.filter(user=request.user, category=category, wallet=wallet, month__contains=date.strftime(date.today(), '%Y-%m')):
             data = {'alerts': {'errors': ['<strong>Oops!</strong> A Budget already exists for that Wallet and Category, for this month']}}
+            today = date.today()
+            last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+            data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                               month__contains=date.strftime(last_month, '%Y-%m'))
+            data['budgets'] = Budget.objects.filter(user=request.user,
+                                                    month__contains=date.strftime(date.today(), '%Y-%m'))
             return render(request, 'pynny/budgets/new_budget.html', context=data)
 
         # Create the new Budget
@@ -72,6 +86,12 @@ def budgets(request):
         Budget(category=category, wallet=wallet, goal=_goal, balance=_start_balance, user=request.user, budget_id=new_id).save()
         data = {'alerts': {'success': ['<strong>Done!</strong> New Budget created successfully!']}}
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
+        today = date.today()
+        last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+        data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                           month__contains=date.strftime(last_month, '%Y-%m'))
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
         return render(request, 'pynny/budgets/budgets.html', context=data, status=201)
 
 
@@ -82,6 +102,10 @@ def new_budget(request):
     data = {}
     data['categories'] = BudgetCategory.objects.filter(user=request.user)
     data['wallets'] = Wallet.objects.filter(user=request.user)
+    today = date.today()
+    last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+    data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                       month__contains=date.strftime(last_month, '%Y-%m'))
 
     # Check if they have any categories or wallets first
     if not data['categories']:
@@ -119,11 +143,23 @@ def one_budget(request, budget_id):
     except Budget.DoesNotExist:
         # DNE
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        today = date.today()
+        last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+        data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                           month__contains=date.strftime(last_month, '%Y-%m'))
+        data['wallets'] = Wallet.objects.filter(user=request.user)
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Budget does not exist.']}
         return render(request, 'pynny/budgets/budgets.html', context=data, status=404)
 
     if budget.user != request.user:
         data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
+        today = date.today()
+        last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+        data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                           month__contains=date.strftime(last_month, '%Y-%m'))
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
         data['alerts'] = {'errors': ['<strong>Oh snap!</strong> That Budget isn\'t yours! You don\'t have permission to view it']}
         return render(request, 'pynny/budgets/budgets.html', context=data, status=403)
 
@@ -137,11 +173,21 @@ def one_budget(request, budget_id):
 
             # And return them to the budgets page
             data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            today = date.today()
+            last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+            data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                               month__contains=date.strftime(last_month, '%Y-%m'))
+            data['wallets'] = Wallet.objects.filter(user=request.user)
             data['alerts'] = {'success': ['<strong>Done!</strong> Budget was deleted successfully']}
             return render(request, 'pynny/budgets/budgets.html', context=data)
         elif action == 'edit':
             # Render the edit_budget view
             data['budget'] = budget
+            today = date.today()
+            last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+            data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                               month__contains=date.strftime(last_month, '%Y-%m'))
             data['categories'] = BudgetCategory.objects.filter(user=request.user)
             data['wallets'] = Wallet.objects.filter(user=request.user)
             return render(request, 'pynny/budgets/edit_budget.html', context=data)
@@ -161,10 +207,22 @@ def one_budget(request, budget_id):
             budget.save()
 
             data = {'alerts': {'success': ['<strong>Done!</strong> Budget updated successfully!']}}
+            today = date.today()
+            last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+            data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                               month__contains=date.strftime(last_month, '%Y-%m'))
+            data['categories'] = BudgetCategory.objects.filter(user=request.user)
+            data['wallets'] = Wallet.objects.filter(user=request.user)
             data['budgets'] = Budget.objects.filter(user=request.user, month__contains=date.strftime(date.today(), '%Y-%m'))
             return render(request, 'pynny/budgets/budgets.html', context=data)
     elif request.method == 'GET':
         # Show the specific Budget data
         data['budget'] = budget
+        today = date.today()
+        last_month = date(today.year, today.month - 1 if today.month > 1 else 12, today.day)
+        data['last_month_budgets'] = Budget.objects.filter(user=request.user,
+                                                           month__contains=date.strftime(last_month, '%Y-%m'))
+        data['categories'] = BudgetCategory.objects.filter(user=request.user)
+        data['wallets'] = Wallet.objects.filter(user=request.user)
         data['transactions'] = Transaction.objects.filter(category=budget.category).order_by('-created_time')
         return render(request, 'pynny/budgets/one_budget.html', context=data)

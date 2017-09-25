@@ -266,6 +266,11 @@ body {
     margin-bottom: 4%;
 }
 
+.budget-card {
+    height: 95%;
+    margin-bottom: 4%;
+}
+
 .form-create, .form-edit {
     margin-top: 20px;
 }

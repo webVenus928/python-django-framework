@@ -28,11 +28,11 @@ class BudgetCategoryAdmin(admin.ModelAdmin):
 class BudgetAdmin(admin.ModelAdmin):
     '''Admin model for Budgets'''
     fieldsets = [
-        (None, {'fields': ['user', 'wallet']}),
+        (None, {'fields': ['user', 'wallet', 'budget_id',]}),
         ('Budget Information', {'fields': ['category', 'goal', 'balance', 'month']})
     ]
-    list_display = ('user', 'wallet', 'category', 'balance', 'goal', 'month')
-    list_filter = ['user__username', 'month']
+    list_display = ('user', 'budget_id', 'wallet', 'category', 'balance', 'goal', 'month')
+    list_filter = ['user__username', 'month', 'budget_id']
     search_fields = ['user__username', 'category__name', 'wallet__name']
 
 
