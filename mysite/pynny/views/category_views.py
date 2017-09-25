@@ -6,11 +6,15 @@ Author: Zachary King
 Implements the views/handlers for BudgetCategory-related requests
 '''
 
+import logging
 from django.shortcuts import redirect, render, reverse
 from django.contrib.auth.decorators import login_required
 from datetime import date
 
 from ..models import BudgetCategory, Budget, Transaction
+
+
+logger = logging.getLogger('category_views')
 
 
 @login_required(login_url='/pynny/login')
@@ -88,6 +92,7 @@ def one_category(request, category_id):
             return render(request, 'pynny/categories/edit_category.html', context=data)
         elif action == 'edit_complete':
             # Get the form data from the request
+            logger.info('Editing completed')
             _name = request.POST['name']
             _is_income = False
             if 'is_income' in request.POST:
