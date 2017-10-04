@@ -4,7 +4,7 @@ from django.utils import timezone
 
 import datetime
 
-from .models import Budget, BudgetCategory, Wallet, Transaction
+from .models import Budget, BudgetCategory, Wallet, Transaction, Savings
 
 
 class ModelStrTests(TestCase):
@@ -26,6 +26,9 @@ class ModelStrTests(TestCase):
 
         self.budget = Budget.objects.create(budget_id=1, user_id=1, category_id=1, goal=100, month=datetime.date(2017, 1, 1), wallet_id=1, balance=0, user=self.user)
         self.budget.save()
+
+        self.saving = Savings(goal=10.0, balance=1.0, delete_on_completion=True, notify_on_completion=False, name='TestSaving', user_id=1, user=self.user, due_date=datetime.datetime.today())
+        self.saving.save()
         self.login()
 
     def login(self):
@@ -48,3 +51,6 @@ class ModelStrTests(TestCase):
 
     def test_budget_str(self):
         self.assertEqual(str(self.budget), 'groceries')
+
+    def test_savings_str(self):
+        self.assertEqual(str(self.saving), 'TestSaving')
