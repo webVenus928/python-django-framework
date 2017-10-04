@@ -12,6 +12,24 @@ from datetime import date, datetime
 
 from decimal import Decimal
 
+
+@register.simple_tag
+def saving_class(saving):
+    ratio = (saving.balance / saving.goal) * Decimal('100')
+    if ratio < Decimal('25'):
+        return 'danger'
+    elif ratio < Decimal('50'):
+        return 'warning'
+    elif ratio < Decimal('75'):
+        return 'info'
+    return 'success'
+
+
+@register.simple_tag
+def saving_prg_bar_width(saving):
+    return Decimal('100') * (saving.balance / saving.goal)
+
+
 @register.filter
 def get_item(dictionary, key):
     '''Custom filter for getting a value from a dictionary

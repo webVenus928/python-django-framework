@@ -1,6 +1,20 @@
 from django.contrib import admin
 
-from .models import Wallet, Budget, Transaction, BudgetCategory
+from .models import Wallet, Budget, Transaction, BudgetCategory, Savings
+
+
+class SavingsAdmin(admin.ModelAdmin):
+    """Savings model admin"""
+    readonly_fields = ('created_time',)
+    fieldsets = [
+        (None, {'fields': ['user',]}),
+        ('Saving Information', {'fields': ['name', 'goal', 'balance', 'due_date']}),
+        ('Settings', {'fields': ['notify_on_completion', 'delete_on_completion', 'completed', 'hidden']}),
+    ]
+    list_display = ('name', 'balance', 'goal', 'due_date', 'completed', 'user',)
+    list_filter = ['user__username', 'completed', 'notify_on_completion', 'delete_on_completion', 'hidden',]
+    search_fields = ['name', 'user__username',]
+
 
 class WalletAdmin(admin.ModelAdmin):
     '''Admin model for the Wallet object'''
@@ -51,3 +65,4 @@ admin.site.register(Wallet, WalletAdmin)
 admin.site.register(BudgetCategory, BudgetCategoryAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Budget, BudgetAdmin)
+admin.site.register(Savings, SavingsAdmin)

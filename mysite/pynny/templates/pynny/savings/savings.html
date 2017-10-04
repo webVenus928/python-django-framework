@@ -1,0 +1,296 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Savings - Pynny{% endblock %}
+
+{% block content %}
+
+<button class="btn btn-primary one-btn-group" type="button" data-toggle="modal" data-target="#createSavingsModal">
+    <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Saving
+</button>
+
+
+<div class="modal fade" id="createSavingsModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Savings Goal</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form class="form-horizontal" action="{% url 'savings' %}" autocomplete="off" method="POST">
+                {% csrf_token %}
+
+                <div class="modal-body">
+                    <label for="inputSavingsName">Name:</label>
+                    <div class="input-group modal-input-group">
+                        <input type="text" class="form-control" id="inputSavingsName" name="name" placeholder="My First Car" required />
+                    </div>
+
+                    <div class="modal-input-group">
+                        <label for="inputSavingsGoal">Goal:</label>
+                        <input id="inputSavingsGoal" class="form-control" type="number" name="goal" placeholder="0.0" required />
+                    </div>
+
+                    <div class="modal-input-group">
+                        <label for="inputSavingsDueDate">Due Date:</label>
+                        <input id="inputSavingsDueDate" class="form-control" type="date" name="due_date" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col col-lg-6">
+                            <label for="inputSavingsNotify">Notify On Completion:</label>
+                            <input id="inputSavingsNotify" type="checkbox" name="notify" value="yes" />
+                        </div>
+
+                        <div class="col col-lg-6">
+                            <label for="inputSavingsDelete">Delete On Completion:</label>
+                            <input id="inputSavingsDelete" type="checkbox" name="delete" value="yes" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editSavingsModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Saving</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form class="form-edit" autocomplete="off" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="edit_complete" />
+
+                    <label for="editSavingsName">Name:</label>
+                    <div class="input-group modal-input-group">
+                        <input type="text" class="form-control" id="editSavingsName" name="name" placeholder="My First Car" required />
+                    </div>
+
+                    <div class="modal-input-group">
+                        <label for="editSavingsGoal">Goal:</label>
+                        <input id="editSavingsGoal" class="form-control" type="number" name="goal" placeholder="0.0" required />
+                    </div>
+
+                    <div class="modal-input-group">
+                        <label for="editSavingsDueDate">Due Date:</label>
+                        <input id="editSavingsDueDate" class="form-control" type="date" name="due_date" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col col-lg-6">
+                            <label for="editSavingsNotify">Notify On Completion:</label>
+                            <input id="editSavingsNotify" type="checkbox" name="notify" value="yes" />
+                        </div>
+
+                        <div class="col col-lg-6">
+                            <label for="editSavingsDelete">Delete On Completion:</label>
+                            <input id="editSavingsDelete" type="checkbox" name="delete" value="yes" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteSavingsModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Saving</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your "<span class="text-muted savingsName"></span>" Saving?</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete" />
+                    <button class="btn btn-danger" type="submit">
+                        <i class="fa fa-trash"></i>&nbsp;Delete
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if savings %}
+    <div class="row">
+    {% for saving in savings %}
+        <div class="col col-lg-4">
+            <div class="card savings-card">
+                <div class="card-header">
+                    <h5 class="card-title">{{ saving.name }} {% if saving.due_date %}<span class="text-muted">(Due {{ saving.due_date }})</span>{% endif %}</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <a href="#" class="btn-link">
+                                <button class="btn btn-wide" type="button"><i class="fa fa-lg fa-search-plus"></i></button>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="button" class="btn btn-primary btn-wide" data-toggle="modal" data-target="#editSavingsModal" data-id="{{ saving.id }}" data-created-time="{% fmt_time saving.created_time %}" data-name="{{ saving.name }}" data-goal="{{ saving.goal }}" data-balance="{{ saving.balance }}" data-due-date="{% fmt_time saving.due_date %}" data-notify="{{ saving.notify_on_completion }}" data-delete="{{ saving.delete_on_completion }}">
+                                <i class="fa fa-lg fa-pencil"></i>
+                            </button>
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="button" class="btn btn-danger btn-wide" data-toggle="modal" data-target="#deleteSavingsModal" data-id="{{ saving.id }}" data-name="{{ saving.name }}">
+                                <i class="fa fa-lg fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item text-center">
+                        Completed: {% if saving.completed %}<i class="fa fa-lg fa-check"></i>{% else %}<i class="fa fa-lg fa-times"></i>{% endif %}
+                    </li>
+                    <li class="list-group-item text-center">
+                        Notify On Completion: {% if saving.notify_on_completion %}<i class="fa fa-lg fa-check"></i>{% else %}<i class="fa fa-lg fa-times"></i>{% endif %}
+                    </li>
+                    <li class="list-group-item text-center">
+                        Delete On Completion: {% if saving.delete_on_completion %}<i class="fa fa-lg fa-check"></i>{% else %}<i class="fa fa-lg fa-times"></i>{% endif %}
+                    </li>
+                    <li class="list-group-item text-center">
+                        <span class="text-muted">Started {{ saving.created_time }}</span>
+                    </li>
+                </ul>
+
+                <div class="card-footer">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped bg-{% saving_class saving %}" role="progressbar" style="width: {% saving_prg_bar_width saving %}%" aria-valuenow="{{ saving.balance }}" aria-valuemin="0" aria-valuemax="{{ saving.goal }}">
+                            <span>${{ saving.balance }} / ${{ saving.goal }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--<td>{{ saving.name }}</td>-->
+        <!--<td>{{ saving.goal }}</td>-->
+        <!--<td>{{ saving.balance }}</td>-->
+        <!--<td>{{ saving.due_date }}</td>-->
+        <!--<td>{{ saving.created_time }}</td>-->
+        <!--<td>{{ saving.completed }}</td>-->
+        <!--<td>{{ saving.notify_on_completion }}</td>-->
+        <!--<td>{{ saving.delete_on_completion }}</td>-->
+    {% endfor %}
+    </div>
+
+
+
+
+
+
+
+    <!--<table id="savingsTable" class="table table-striped table-hover table-links" cellspacing="0" width="100%">-->
+        <!--<thead>-->
+            <!--<tr>-->
+                <!--<th>Name</th>-->
+                <!--<th>Goal</th>-->
+                <!--<th>Current Balance</th>-->
+                <!--<th>Due Date</th>-->
+                <!--<th>Started At</th>-->
+                <!--<th>Completed</th>-->
+                <!--<th>Notification</th>-->
+                <!--<th>Auto-Delete</th>-->
+                <!--<th>Action</th>-->
+            <!--</tr>-->
+        <!--</thead>-->
+        <!--<tbody>-->
+            <!--{% for saving in savings %}-->
+                <!--<td>{{ saving.name }}</td>-->
+                <!--<td>{{ saving.goal }}</td>-->
+                <!--<td>{{ saving.balance }}</td>-->
+                <!--<td>{{ saving.due_date }}</td>-->
+                <!--<td>{{ saving.created_time }}</td>-->
+                <!--<td>{{ saving.completed }}</td>-->
+                <!--<td>{{ saving.notify_on_completion }}</td>-->
+                <!--<td>{{ saving.delete_on_completion }}</td>-->
+                <!--<td>-->
+                    <!--<a href="#" class="btn-link">-->
+                        <!--<button class="btn btn-sm" type="button"><i class="fa fa-lg fa-search-plus"></i></button>-->
+                    <!--</a>-->
+                    <!--<button type="button" class="btn btn-sm btn-primary btn-inline" data-toggle="modal" data-target="#editSavingsModal" data-id="{{ saving.id }}" data-created-time="{% fmt_time saving.created_time %}" data-name="{{ saving.name }}" data-goal="{{ saving.goal }}" data-balance="{{ saving.balance }}" data-due-date="{% fmt_time saving.due_date %}" data-notify="{{ saving.notify_on_completion }}" data-delete="{{ saving.delete_on_completion }}">-->
+                        <!--<i class="fa fa-lg fa-pencil"></i>-->
+                    <!--</button>-->
+                    <!--<button type="button" class="btn btn-sm btn-danger btn-inline" data-toggle="modal" data-target="#deleteSavingsModal" data-id="{{ saving.id }}" data-name="{{ saving.name }}">-->
+                        <!--<i class="fa fa-lg fa-trash"></i>-->
+                    <!--</button>-->
+                <!--</td>-->
+            <!--{% endfor %}-->
+        <!--</tbody>-->
+    <!--</table>-->
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't created any Savings yet. Get started
+        by clicking <span class="alert-link" style="cursor: pointer" data-toggle="modal" data-target="#createSavingsModal">New Saving</span>.
+    </div>
+{% endif %}
+
+<script>
+    $(document).ready(function() {
+        $("#savingsTable").DataTable({
+            dom: 'lrtip',
+            order: [[4, "desc"], [3, "desc"]],
+            lengthMenu: [[5, 10, 50, -1], [5, 10, 50, 'All']],
+            responsive: true,
+          });
+
+        $('#editSavingsModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var savingsId = button.data('id');    // extract data
+            var savingsName = button.data('name');
+            var savingsGoal = button.data('goal');
+            var savingsBalance = button.data('balance');
+            var savingsDueDate = button.data('due-date');
+            var savingsCreatedTime = button.data('created-time');
+            var savingsNotify = button.data('notify');
+            var savingsDelete = button.data('delete');
+
+            var modal = $(this);
+            modal.find('.form-edit').attr('action', '/pynny/savings/' + savingsId);
+            modal.find('#editSavingsName').val(savingsName);
+            modal.find('#editSavingsGoal').val(savingsGoal);
+            modal.find('#editSavingsBalance').val(savingsBalance);
+            if (savingsNotify === 'True')
+                modal.find('#editSavingsNotify').prop('checked', true);
+            if (savingsDelete === 'True')
+                modal.find('#editSavingsDelete').prop('checked', true);
+            modal.find('#editSavingsDueDate').val(savingsDueDate);
+        });
+
+        $('#deleteSavingsModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var savingsId = button.data('id');    // extract data
+            var savingsName = button.data('name');
+
+            var modal = $(this);
+            modal.find('form').attr('action', '/pynny/savings/' + savingsId);
+            modal.find('.savingsName').text(savingsName);
+        });
+    });
+</script>
+
+{% endblock %}
