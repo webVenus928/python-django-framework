@@ -1,0 +1,245 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}Transactions - Pynny{% endblock %}
+
+{% block content %}
+
+<div class="modal fade" id="createTransactionModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Transaction</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{% url 'transactions' %}" autocomplete="off" method="POST" id="new_transaction_form">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="create" />
+
+                    <label for="inputTransactionCategory">Category: </label>
+                    <div class="input-group">
+                        <select id="inputTransactionCategory" name="category" class="form-control">
+                            {% for category in categories %}
+                                <option class="text-{% category_class category.is_income %}" value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="inputTransactionWallet">Wallet: </label>
+                    <div class="input-group">
+                        <select id="inputTransactionWallet" name="wallet" class="form-control">
+                            {% for wallet in wallets %}
+                                <option value="{{ wallet.id }}">{{ wallet.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="inputTransactionAmount">Amount: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <input id="inputTransactionAmount" type="number" class="form-control" name="amount" step=0.01 value=0>
+                    </div>
+
+                    <label for="inputTransactionDescription">Description: </label>
+                    <div class="input-group">
+                        <input id="inputTransactionDescription" type="text" class="form-control" name="description" placeholder="groceries at the food market">
+                    </div>
+
+                    <label for="inputTransactionCreatedTime">Recorded At: </label>
+                    <div class="input-group">
+                        <input id="inputTransactionCreatedTime" type="date" class="form-control" name="created_time" step=1 value="{{ default_date }}">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editTransactionModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Transaction</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form autocomplete="off" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="edit_complete">
+
+                    <label for="editTransactionCategory">Category: </label>
+                    <div class="input-group">
+                        <select id="editTransactionCategory" name="category" class="form-control">
+                            {% for category in categories %}
+                                <option id="optionCategory{{ category.id }}" class="text-{% category_class category.is_income %}" value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="editTransactionWallet">Wallet: </label>
+                    <div class="input-group">
+                        <select id="editTransactionWallet" name="wallet" class="form-control">
+                            {% for wallet in wallets %}
+                                <option id="optionWallet{{ wallet.id }}" value="{{ wallet.id }}">{{ wallet.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="editTransactionAmount">Amount: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <input id="editTransactionAmount" type="number" class="form-control" name="amount" step=0.01>
+                    </div>
+
+                    <label for="editTransactionDescription">Description: </label>
+                    <div class="input-group">
+                        <input id="editTransactionDescription" type="text" class="form-control" name="description" placeholder="groceries at the food market">
+                    </div>
+
+                    <label for="editTransactionCreatedAt">Recorded At: </label>
+                    <div class="input-group">
+                        <input id="editTransactionCreatedAt" type="date" class="form-control" name="created_time" step=1>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteTransactionModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Transaction</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this Transaction?</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete" />
+                    <button class="btn btn-danger" type="submit">
+                        <i class="fa fa-trash"></i>&nbsp;Delete
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<button class="btn btn-primary transaction-create one-btn-group" data-toggle="modal" data-target="#createTransactionModal">
+    <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Transaction
+</button>
+
+
+<h1>Transactions</h1>
+
+{% if transactions %}
+    <table id="transactionsTable" class="table table-striped table-hover table-collapsed" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Wallet</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Recorded</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+                <tr>
+                    <td class="text-{% wallet_class transaction.wallet.balance %}">
+                        {{ transaction.wallet.name }}
+                    </td>
+                    <td class="text-{% category_class transaction.category.is_income %}">
+                        {{ transaction.category.name }}
+                    </td>
+                    <td class="text-{% transaction_class transaction %}">
+                        ${{ transaction.amount }}
+                    </td>
+                    <td>
+                        {% shorten_string transaction.description 20 %}
+                    </td>
+                    <td>
+                        {{ transaction.created_time }}
+                    </td>
+                    <td>
+                        <a href="{% url 'one_transaction' transaction_id=transaction.id %}">
+                            <button class="btn btn-sm" type="button"><i class="fa fa-lg fa-search-plus"></i></button>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-primary btn-inline" data-toggle="modal" data-target="#editTransactionModal" data-id="{{ transaction.id }}" data-wallet="{{ transaction.wallet.id }}" data-category="{{ transaction.category.id }}" data-amount="{{ transaction.amount }}" data-description="{{ transaction.description }}" data-date="{% fmt_time transaction.created_time %}">
+                            <i class="fa fa-lg fa-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger btn-inline" data-toggle="modal" data-target="#deleteTransactionModal" data-id="{{ transaction.id }}">
+                            <i class="fa fa-lg fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't recorded any Transactions yet. Get started 
+        by clicking <a href="{% url 'new_transaction' %}">New Transaction</a>.
+    </div>
+{% endif %}
+
+<script>
+    $(document).ready(function() {
+        $("#transactionsTable").DataTable({
+            dom: 'lrtip',
+            order: [[4, "desc"], [0, "desc"], [1, "desc"]],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'All']],
+            responsive: true,
+          });
+
+        $('#editTransactionModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var transactionid = button.data('id');    // extract data
+            var transactionCategoryId = button.data('category');
+            var transactionWalletId = button.data('wallet');
+            var transactionAmount = button.data('amount');
+            var transactionDescription = button.data('description');
+            var transactionDate = button.data('date');
+
+            var modal = $(this);
+            modal.find('.form-edit').attr('action', '/pynny/transactions/' + transactionCategoryId);
+            modal.find('#optionCategory' + transactionCategoryId).prop('selected', true);
+            modal.find('#optionWallet' + transactionWalletId).prop('selected', true);
+            modal.find('#editTransactionAmount').val(transactionAmount);
+            modal.find('#editTransactionDescription').val(transactionDescription);
+            modal.find('#editTransactionCreatedAt').val(transactionDate);
+        });
+
+        $('#deleteTransactionModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var transactionId = button.data('id');    // extract data
+
+            var modal = $(this);
+            modal.find('form').attr('action', '/pynny/transactions/' + transactionId);
+        });
+    });
+</script>
+
+{% endblock %}

@@ -8,13 +8,14 @@ Defines the URLs (endpoint routing) for
 the Pynny web app.
 '''
 
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 
-from .views import wallet_views, budget_views, category_views, transaction_views, main_views
+from .views import wallet_views, budget_views, category_views, transaction_views, main_views, savings_views, notification_views
 
 urlpatterns = [
     url(r'^$', main_views.index, name='index'), # /
+    url(r'^dashboard/$', main_views.index, name='dashboard'),  # /dashboard/
     url(r'^login/$', auth_views.login, name='login'), # /login/
     url(r'^logout/$', main_views.logout_view, name='logout'), # /logout/
     url(r'^wallets/$', wallet_views.wallets, name='wallets'), # /wallets/
@@ -30,4 +31,7 @@ urlpatterns = [
     url(r'^transactions/(?P<transaction_id>[0-9]+)$', transaction_views.one_transaction, name='one_transaction'), # /transactions/9
     url(r'^transactions/create/$', transaction_views.new_transaction, name='new_transaction'), # /transactions/create
     url(r'^budgets/renew/$', budget_views.renew_budgets, name='renew_budgets'),  # /budgets/renew
+    url(r'^savings/$', savings_views.savings, name='savings'),  # /savings/
+    url(r'^savings/(?P<savings_id>[0-9]+)$', savings_views.one_saving, name='one_saving'),  # /savings/5
+    url(r'^notifications/dismiss/$', notification_views.dismiss_notice, name='dismiss_notice'),
 ]

@@ -14,7 +14,8 @@ from datetime import date, datetime
 from django.utils import timezone
 import random
 
-from ..models import Budget, Transaction, BudgetCategory
+from ..models import Budget, Transaction, BudgetCategory, Notification
+
 
 @login_required(login_url='/pynny/login')
 def index(request):
@@ -53,7 +54,7 @@ def index(request):
         data['transactions_per_category_colors'].append(colors[color_index])
         color_index = (color_index + 1) % len(colors)
 
-    return render(request, 'pynny/dashboard.html', context=data)
+    return render(request, 'pynny/base/dashboard.html', context=data)
 
 
 @login_required(login_url='/pynny/login')

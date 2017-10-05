@@ -1,0 +1,213 @@
+{% extends 'pynny/base/base.html' %}
+
+{% block title %}{{ category.name.title }} Category - Pynny{% endblock %}
+
+{% block content %}
+
+<div class="modal fade" id="createCategoryModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Category</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form class="form-inline" action="{% url 'categories' %}" autocomplete="off" method="POST" id="new_category_form">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="create" />
+
+                    <div class="form-group">
+                        <label for="inputCategoryName">Category Name:&nbsp;</label>
+                        <div class="input-group">
+                            <input id="inputCategoryName" type="text" class="form-control" name="name" placeholder="Groceries">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputCategoryIsIncome">Is Income:&nbsp;&nbsp;</label>
+                        <div class="input-group">
+                            <input id="inputCategoryIsIncome" type="checkbox" name="is_income" value=0>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editCategoryModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Category</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form class="form-inline form-edit" autocomplete="off" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="edit_complete">
+
+                    <div class="form-group">
+                        <label for="inputCategoryName">Category Name:&nbsp;</label>
+                        <div class="input-group">
+                            <input id="editCategoryName" type="text" class="form-control" name="name" placeholder="Groceries">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputCategoryIsIncome">Is Income:&nbsp;&nbsp;</label>
+                        <div class="input-group">
+                            <input id="editCategoryIsIncome" type="checkbox" name="is_income" value=0>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteCategoryModal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Category</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your "<span class="text-muted categoryName"></span>" Category?
+                    This will delete any data related to the category, such as transactions and budgets.</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete" />
+                    <button class="btn btn-danger" type="submit">
+                        <i class="fa fa-trash"></i>&nbsp;Delete
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="one-btn-group">
+    <button class="btn btn-primary create-btn" type="button" data-toggle="modal" data-target="#createCategoryModal">
+        <i class="fa fa-lg fa-plus-circle"></i>&nbsp;New Category
+    </button>
+
+    <button type="button" class="btn btn-default one-edit-btn" data-toggle="modal" data-target="#editCategoryModal" data-id="{{ category.id }}" data-name="{{ category.name }}" data-income="{{ category.is_income }}">
+        <i class="fa fa-lg fa-pencil"></i>&nbsp; Edit Category
+    </button>
+
+    <button class="btn btn-xs btn-danger pull-right one-delete-btn" type="button" data-toggle="modal" data-target="#deleteCategoryModal" data-id="{{ category.id }}" data-name="{{ category.name }}">
+        <i class="fa fa-lg fa-trash"></i>&nbsp;Delete
+    </button>
+</div>
+
+<h1 class="text-{% category_class category.is_income %}">{{ category.name }}</h1>
+
+<!-- Show all budgets with this category -->
+<h2>Budgets</h2>
+{% if budgets %}
+    <table class="table table-striped table-hover table-links">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Used / Goal</th>
+                <th>Month</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for budget in budgets %}
+                <tr class="tr-link {% budget_class budget %}" data-href="{% url 'one_budget' budget_id=budget.id %}">
+                    <td>{{ budget.category.name }}</td>
+                    <td>${{ budget.balance }} / ${{ budget.goal }}</td>
+                    <td>{{ budget.month }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't created any Budgets for this Category yet. You can 
+        create one <a href="{% url 'new_budget' %}">here</a>.
+    </div>
+{% endif %}
+
+<br />
+
+<!-- Show all transaction tagged with this category -->
+<h2>Transactions</h2>
+{% if transactions %}
+    <table class="table table-striped table-hover table-links">
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trans in transactions %}
+                <tr class="tr-link" data-href="{% url 'one_transaction' transaction_id=trans.id %}">
+                    <td>${{ trans.amount }}</td>
+                    <td>{{ trans.category.name }}</td>
+                    <td>{{ trans.description }}</td>
+                    <td>{{ trans.created_time }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        <strong>Heads up!</strong> You haven't recorded any Transactions marked as this Category yet. You 
+        can create one <a href="{% url 'new_transaction' %}">here</a>.
+    </div>
+{% endif %}
+
+<script>
+    $(document).ready(function() {
+        $('#editCategoryModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var categoryId = button.data('id');    // extract data
+            var categoryName = button.data('name');
+            var categoryIsIncome = button.data('income');
+
+            var modal = $(this);
+            modal.find('.form-edit').attr('action', '/pynny/categories/' + categoryId);
+            modal.find('#editCategoryName').val(categoryName);
+            if (categoryIsIncome === "True")
+                modal.find('#editCategoryIsIncome').prop('checked', true);
+            else
+                modal.find('#editCategoryIsIncome').prop('checked', false);
+        });
+
+        $('#deleteCategoryModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // button that triggered the modal
+            var categoryId = button.data('id');    // extract data
+            var categoryName = button.data('name');
+
+            var modal = $(this);
+            modal.find('form').attr('action', '/pynny/categories/' + categoryId);
+            modal.find('.categoryName').text(categoryName);
+        });
+    });
+</script>
+
+{% endblock %}
