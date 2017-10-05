@@ -31,11 +31,9 @@ class MainViewsTests(TestCase):
 
     def test_logout_view(self):
         self.client.login(username='test_user', password='tester123')
-        # print('Before:', self.client.get(reverse('index')).context['user'])
         response = self.client.get(reverse('logout'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(response.context.get('user', '')), 'AnonymousUser')
-        # print('After:', response.context['user'])
 
     def test_login(self):
         self.client.login(username='test_user', password='tester123')
