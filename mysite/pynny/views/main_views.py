@@ -14,7 +14,8 @@ from datetime import date, datetime
 from django.utils import timezone
 import random
 
-from ..models import Budget, Transaction, BudgetCategory
+from ..models import Budget, Transaction, BudgetCategory, Notification
+
 
 @login_required(login_url='/pynny/login')
 def index(request):

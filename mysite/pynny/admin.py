@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Wallet, Budget, Transaction, BudgetCategory, Savings
+from .models import Wallet, Budget, Transaction, BudgetCategory, Savings, Notification
 
 
 class SavingsAdmin(admin.ModelAdmin):
@@ -61,8 +61,20 @@ class TransactionAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'description', 'category__name', 'wallet__name']
 
 
+class NotificationAdmin(admin.ModelAdmin):
+    """Admin interface model for Notifications"""
+    readonly_fields = ('created_time','dismissed_at')
+    fieldsets = [
+        (None, {'fields': ['user', 'created_time']}),
+        ('Notification Information', {'fields': ['title', 'body', 'alert', 'type', 'dismissed', 'dismissed_at']})
+    ]
+    list_display = ('type', 'title', 'user', 'created_time', 'dismissed')
+    list_filter = ['user__username', 'type', 'dismissed', 'alert']
+
+
 admin.site.register(Wallet, WalletAdmin)
 admin.site.register(BudgetCategory, BudgetCategoryAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Budget, BudgetAdmin)
 admin.site.register(Savings, SavingsAdmin)
+admin.site.register(Notification, NotificationAdmin)

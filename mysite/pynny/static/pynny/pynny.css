@@ -336,3 +336,7 @@ body {
 .center-text {
     text-align: center;
 }
+
+.alerts {
+    margin-top: 20px;
+}

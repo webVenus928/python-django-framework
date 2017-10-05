@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import random
 from django.conf import global_settings
-import dj_database_url
 import string
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -24,21 +23,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''.join([random.SystemRandom().choice("{}{}{}".format(string.ascii_letters, string.digits, string.punctuation)) for i in range(50)])
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', ''.join([random.SystemRandom().choice("{}{}{}".format(string.ascii_letters, string.digits, string.punctuation)) for i in range(50)]))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-#DEBUG = True
+DEBUG = bool(os.environ.get('DJANGO_DEBUG', False))
 
-SESSION_COOKIE_SECURE=True
-SESSION_COOKIE_HTTPONLY=True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = bool(os.environ.get('DJANGO_SESSION_COOKIE_SECURE', True))
+SESSION_COOKIE_HTTPONLY = bool(os.environ.get('DJANGO_SESSION_COOKIE_HTTPONLY', True))
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', os.environ.get('DJANGO_X_FORWARDED_PROTO', 'https'))
+
+CSRF_USE_SESSIONS = True
 
 ALLOWED_HOSTS = ['*',]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'pynny.apps.PynnyConfig',
     'bootstrap_admin',
@@ -48,7 +47,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -73,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'pynny.context_processors.notifications',
             ],
         },
     },
@@ -87,15 +90,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-DATABASES = dict()
-if os.environ.get('DATABASE_URL', None) is None:
-    DATABASES['default'] = {
+DATABASES = {
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-else:
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+}
 
 
 # Password validation
@@ -135,4 +135,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 USER = 'ec2-user' # Using ec2-user as example (i.e. AWS). Could be ubuntu, or w/e
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/{}/pynny/mysite/pynny/static/'.format(USER)
+STATIC_ROOT = os.path.join(BASE_DIR, os.environ.get('DJANGO_STATIC_ROOT', '/home/{}/pynny/mysite/pynny/static/'.format(USER)))

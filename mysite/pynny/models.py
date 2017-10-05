@@ -110,3 +110,18 @@ class Savings(models.Model):
         """Returns the name of the savings object"""
         return self.name
 
+@python_2_unicode_compatible
+class Notification(models.Model):
+    """A site-level notification"""
+    type = models.CharField(max_length=40, blank=False)
+    title = models.CharField(max_length=100, blank=False)
+    body = models.TextField(blank=False)
+    created_time = models.DateTimeField(editable=False, blank=True, default=timezone.now)
+    alert = models.CharField(max_length=10, blank=True)
+    dismissed = models.BooleanField(default=False)
+    dismissed_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
+
+    def __str__(self):
+        """Returns the title of the notification"""
+        return self.title
