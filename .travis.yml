@@ -4,6 +4,14 @@ python:
   - "3.5"
   - "3.6"
 
+env:
+  - DJANGO_STATIC_ROOT=static/
+  - DJANGO_SECRET_KEY=r\'+)c&*P#LM/3xchu$"2j~5[x3A\\3wm$1#u_3LKeaYG{~\'+zlZ
+  - DJANGO_DEBUG=1
+  - DJANGO_SESSION_COOKIE_HTTPONLY=""
+  - DJANGO_SESSION_COOKIE_SECURE=""
+  - DJANGO_X_FORWARDED_PROTO=http
+
 install: 
   - pip install -r requirements.txt
   - pip install codecov
